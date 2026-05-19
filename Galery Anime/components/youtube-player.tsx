@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { addToHistory, updateWatchProgress, toggleBookmark, isBookmarked } from "@/lib/watch-history"
+import { Sun, Volume2 } from "lucide-react"
 
 interface YouTubePlayerProps {
   videoId: string
@@ -54,6 +55,18 @@ export default function YouTubePlayer({
   const [isFullscreen, setIsFullscreen] = useState(false)
   const progressInterval = useRef<NodeJS.Timeout>()
 
+  // Brightness and Volume controls
+  const [brightness, setBrightness] = useState(100)
+  const [volume, setVolume] = useState(100)
+  const [showBrightnessIndicator, setShowBrightnessIndicator] = useState(false)
+  const [showVolumeIndicator, setShowVolumeIndicator] = useState(false)
+  const brightnessTimeout = useRef<NodeJS.Timeout>()
+  const volumeTimeout = useRef<NodeJS.Timeout>()
+  const touchStartX = useRef<number>(0)
+  const touchStartY = useRef<number>(0)
+  const lastBrightness = useRef<number>(100)
+  const lastVolume = useRef<number>(100)
+
   // Fetch clips, trailers, and episodes
   useEffect(() => {
     async function fetchClips() {
@@ -87,6 +100,89 @@ export default function YouTubePlayer({
     return () => window.removeEventListener("bookmarksUpdated", handleBookmarkUpdate)
   }, [videoId])
 
+  // Gesture controls for brightness and volume
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (!isFullscreen) return
+
+      touchStartX.current = e.touches[0].clientX
+      touchStartY.current = e.touches[0].clientY
+      lastBrightness.current = brightness
+      lastVolume.current = volume
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isFullscreen) return
+
+      const touchX = e.touches[0].clientX
+      const touchY = e.touches[0].clientY
+      const deltaX = touchX - touchStartX.current
+      const deltaY = touchY - touchStartY.current
+
+      // Determine if horizontal or vertical swipe
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        // Horizontal swipe = Brightness control
+        e.preventDefault()
+        const screenWidth = window.innerWidth
+        const brightnessChange = (deltaX / screenWidth) * 100
+        const newBrightness = Math.max(10, Math.min(200, lastBrightness.current + brightnessChange))
+
+        setBrightness(newBrightness)
+        setShowBrightnessIndicator(true)
+
+        // Clear previous timeout
+        if (brightnessTimeout.current) {
+          clearTimeout(brightnessTimeout.current)
+        }
+
+        // Hide indicator after 1.5s
+        brightnessTimeout.current = setTimeout(() => {
+          setShowBrightnessIndicator(false)
+        }, 1500)
+
+        // Apply brightness to video container
+        if (container) {
+          container.style.filter = `brightness(${newBrightness}%)`
+        }
+      } else {
+        // Vertical swipe = Volume control
+        e.preventDefault()
+        const screenHeight = window.innerHeight
+        const volumeChange = -(deltaY / screenHeight) * 100
+        const newVolume = Math.max(0, Math.min(100, lastVolume.current + volumeChange))
+
+        setVolume(newVolume)
+        setShowVolumeIndicator(true)
+
+        // Clear previous timeout
+        if (volumeTimeout.current) {
+          clearTimeout(volumeTimeout.current)
+        }
+
+        // Hide indicator after 1.5s
+        volumeTimeout.current = setTimeout(() => {
+          setShowVolumeIndicator(false)
+        }, 1500)
+
+        // Apply volume to player
+        if (player && typeof player.setVolume === 'function') {
+          player.setVolume(newVolume)
+        }
+      }
+    }
+
+    container.addEventListener('touchstart', handleTouchStart, { passive: true })
+    container.addEventListener('touchmove', handleTouchMove, { passive: false })
+
+    return () => {
+      container.removeEventListener('touchstart', handleTouchStart)
+      container.removeEventListener('touchmove', handleTouchMove)
+    }
+  }, [isFullscreen, brightness, volume, player])
+
   // Auto landscape fullscreen on orientation change
   useEffect(() => {
     const handleOrientationChange = () => {
@@ -119,7 +215,14 @@ export default function YouTubePlayer({
   // Track fullscreen state
   useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement)
+      const isNowFullscreen = !!document.fullscreenElement
+      setIsFullscreen(isNowFullscreen)
+
+      // Reset brightness when exiting fullscreen
+      if (!isNowFullscreen && containerRef.current) {
+        containerRef.current.style.filter = 'brightness(100%)'
+        setBrightness(100)
+      }
     }
 
     document.addEventListener('fullscreenchange', handleFullscreenChange)
@@ -152,6 +255,9 @@ export default function YouTubePlayer({
           events: {
             onReady: (event: any) => {
               setPlayer(event.target)
+
+              // Set initial volume
+              event.target.setVolume(volume)
 
               // Add to history when player is ready
               addToHistory({
@@ -267,7 +373,8 @@ export default function YouTubePlayer({
           height: 0,
           overflow: "hidden",
           background: "#000",
-          borderRadius: "12px"
+          borderRadius: "12px",
+          transition: "filter 0.1s ease"
         }}
       >
         <iframe
@@ -283,6 +390,93 @@ export default function YouTubePlayer({
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
           allowFullScreen
         />
+
+        {/* Brightness Indicator */}
+        {showBrightnessIndicator && isFullscreen && (
+          <div style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            background: "rgba(0, 0, 0, 0.8)",
+            borderRadius: "12px",
+            padding: "1.5rem 2rem",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "1rem",
+            zIndex: 1000,
+            pointerEvents: "none"
+          }}>
+            <Sun size={32} color="var(--gold)" />
+            <div style={{
+              width: "200px",
+              height: "8px",
+              background: "rgba(255, 255, 255, 0.2)",
+              borderRadius: "4px",
+              overflow: "hidden"
+            }}>
+              <div style={{
+                width: `${(brightness / 200) * 100}%`,
+                height: "100%",
+                background: "var(--gold)",
+                transition: "width 0.1s ease"
+              }} />
+            </div>
+            <span style={{
+              color: "var(--gold)",
+              fontSize: "1.25rem",
+              fontWeight: 600
+            }}>
+              {Math.round(brightness)}%
+            </span>
+          </div>
+        )}
+
+        {/* Volume Indicator */}
+        {showVolumeIndicator && isFullscreen && (
+          <div style={{
+            position: "absolute",
+            top: "50%",
+            right: "2rem",
+            transform: "translateY(-50%)",
+            background: "rgba(0, 0, 0, 0.8)",
+            borderRadius: "12px",
+            padding: "1.5rem 1rem",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "1rem",
+            zIndex: 1000,
+            pointerEvents: "none"
+          }}>
+            <Volume2 size={32} color="var(--gold)" />
+            <div style={{
+              width: "8px",
+              height: "200px",
+              background: "rgba(255, 255, 255, 0.2)",
+              borderRadius: "4px",
+              overflow: "hidden",
+              position: "relative"
+            }}>
+              <div style={{
+                position: "absolute",
+                bottom: 0,
+                width: "100%",
+                height: `${volume}%`,
+                background: "var(--gold)",
+                transition: "height 0.1s ease"
+              }} />
+            </div>
+            <span style={{
+              color: "var(--gold)",
+              fontSize: "1.25rem",
+              fontWeight: 600
+            }}>
+              {Math.round(volume)}%
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Player Controls */}
@@ -394,6 +588,19 @@ export default function YouTubePlayer({
           }}>
             {genre}
           </span>
+        </div>
+
+        {/* Gesture Instructions */}
+        <div style={{
+          marginTop: "1rem",
+          padding: "0.75rem 1rem",
+          background: "var(--card)",
+          border: "1px solid var(--border)",
+          borderRadius: "8px",
+          fontSize: "0.875rem",
+          color: "var(--text-2)"
+        }}>
+          <strong style={{ color: "var(--gold)" }}>Mode Landscape:</strong> Geser kanan/kiri untuk brightness • Geser atas/bawah untuk volume
         </div>
       </div>
 
