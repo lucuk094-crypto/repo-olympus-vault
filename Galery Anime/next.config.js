@@ -7,9 +7,7 @@ const nextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "**" },
     ],
-  },
-  turbopack: {
-    root: __dirname,
+    unoptimized: true,
   },
 }
 

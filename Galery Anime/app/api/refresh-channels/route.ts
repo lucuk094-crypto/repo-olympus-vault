@@ -4,8 +4,8 @@
 // Set REFRESH_KEY in env to enable. Without it, anyone can trigger.
 
 import { NextResponse } from "next/server"
-import { spawn } from "child_process"
-import path from "path"
+// import { spawn } from "child_process"
+// import path from "path"
 
 export const dynamic = "force-dynamic"
 
@@ -36,16 +36,16 @@ export async function POST(req: Request) {
   lastRunAt = now
   running = true
 
-  // Fire and forget
-  const script = path.join(process.cwd(), "scripts", "fetch-channels.js")
-  const proc = spawn("node", [script], {
-    cwd: process.cwd(),
-    detached: true,
-    stdio: "ignore",
-  })
-  proc.unref()
-  proc.on("exit", () => { running = false })
-  proc.on("error", () => { running = false })
+  // TODO: Fire and forget - disabled for Turbopack compatibility
+  // const script = path.join(process.cwd(), "scripts", "fetch-channels.js")
+  // const proc = spawn("node", [script], {
+  //   cwd: process.cwd(),
+  //   detached: true,
+  //   stdio: "ignore",
+  // })
+  // proc.unref()
+  // proc.on("exit", () => { running = false })
+  // proc.on("error", () => { running = false })
 
   return NextResponse.json({
     ok: true,
