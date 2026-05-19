@@ -1,0 +1,104 @@
+{
+  "lastUpdated": "2026-05-19T16:04:43.145Z",
+  "channels": [
+    {
+      "channelId": "UC_ApexAction1",
+      "handle": "@ApexAction1",
+      "name": "Apex Action",
+      "genre": "action",
+      "type": "film",
+      "description": "Full-length action movies",
+      "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC_ApexAction1",
+      "series": [],
+      "videoCount": 0,
+      "instructions": "Use /api/rss-update?channelId=UC_ApexAction1 to fetch latest videos"
+    },
+    {
+      "channelId": "UC_JagoanDonghua",
+      "handle": "@JagoanDonghua",
+      "name": "Jagoan Donghua",
+      "genre": "action",
+      "type": "anime",
+      "description": "Chinese animation series",
+      "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC_JagoanDonghua",
+      "series": [],
+      "videoCount": 0,
+      "instructions": "Use /api/rss-update?channelId=UC_JagoanDonghua to fetch latest videos"
+    },
+    {
+      "channelId": "UC_HitFlix",
+      "handle": "@HitFlix-RC",
+      "name": "HitFlix",
+      "genre": "action",
+      "type": "film",
+      "description": "Action and thriller movies",
+      "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC_HitFlix",
+      "series": [],
+      "videoCount": 0,
+      "instructions": "Use /api/rss-update?channelId=UC_HitFlix to fetch latest videos"
+    },
+    {
+      "channelId": "UC_MovieSphere",
+      "handle": "@MovieSphereHorror-SciFi",
+      "name": "MovieSphere Horror & SciFi",
+      "genre": "horror",
+      "type": "film",
+      "description": "Horror and sci-fi movies",
+      "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC_MovieSphere",
+      "series": [],
+      "videoCount": 0,
+      "instructions": "Use /api/rss-update?channelId=UC_MovieSphere to fetch latest videos"
+    },
+    {
+      "channelId": "UC_AmazingAnime",
+      "handle": "@AmazingAnimeMan",
+      "name": "Amazing Anime Man",
+      "genre": "action",
+      "type": "anime",
+      "description": "Anime series and movies",
+      "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC_AmazingAnime",
+      "series": [],
+      "videoCount": 0,
+      "instructions": "Use /api/rss-update?channelId=UC_AmazingAnime to fetch latest videos"
+    },
+    {
+      "channelId": "UC_SuperheroFXL",
+      "handle": "@SuperheroFXLGames",
+      "name": "Superhero FXL Games",
+      "genre": "action",
+      "type": "film",
+      "description": "Superhero action movies",
+      "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC_SuperheroFXL",
+      "series": [],
+      "videoCount": 0,
+      "instructions": "Use /api/rss-update?channelId=UC_SuperheroFXL to fetch latest videos"
+    },
+    {
+      "channelId": "UC_HotAnime",
+      "handle": "@hotanime-ri9zc",
+      "name": "Hot Anime",
+      "genre": "action",
+      "type": "anime",
+      "description": "Popular anime series",
+      "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC_HotAnime",
+      "series": [],
+      "videoCount": 0,
+      "instructions": "Use /api/rss-update?channelId=UC_HotAnime to fetch latest videos"
+    },
+    {
+      "channelId": "UC_FILVOXFOX",
+      "handle": "@FILVOXFOX",
+      "name": "FILVOX FOX",
+      "genre": "action",
+      "type": "film",
+      "description": "Action movies collection",
+      "rssUrl": "https://www.youtube.com/feeds/videos.xml?channel_id=UC_FILVOXFOX",
+      "series": [],
+      "videoCount": 0,
+      "instructions": "Use /api/rss-update?channelId=UC_FILVOXFOX to fetch latest videos"
+    }
+  ],
+  "totalVideos": 0,
+  "totalSeries": 0,
+  "note": "This is a template structure. Run RSS update API to fetch real data from YouTube."
+}

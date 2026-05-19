@@ -2389,3 +2389,28 @@ html.light .vx-auth-input input:focus {
   .vx-auth-brand-title { font-size: 1.15rem; }
   .vx-auth-social { grid-template-columns: 1fr; }
 }
+
+
+/* ============================================
+   YouTube Channel Cards & Episode Cards
+   ============================================ */
+
+.channel-card {
+  transition: all 0.2s ease;
+}
+
+.channel-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+  border-color: var(--gold) !important;
+}
+
+.episode-card {
+  transition: all 0.2s ease;
+}
+
+.episode-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+

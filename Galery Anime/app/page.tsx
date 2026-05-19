@@ -20,6 +20,7 @@ import HeroCarousel, { type HeroSlide } from "@/components/hero-carousel"
 import SectionRow from "@/components/section-row"
 import Poster from "@/components/poster"
 import LatestEpisodes from "@/components/latest-episodes"
+import ChannelsSection from "@/components/channels-section"
 
 export const revalidate = 1800 // 30 min
 export const dynamic = "force-dynamic" // always fetch fresh, no build-time prerender that can fail
@@ -193,6 +194,9 @@ export default async function HomePage() {
           />
         ))}
       </SectionRow>
+
+      {/* YouTube Channels Section */}
+      <ChannelsSection />
 
       <div className="greek-divider">
         <span className="greek-laurel">✦ φιλοσοφία ✦</span>

@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation"
 import {
   Search, Bell, X,
   Home, Film, Theater, BookOpen, Newspaper, Sparkles, Radio, Heart, Compass, Info, Sun, Moon,
-  MoreHorizontal, Calendar, LogIn,
+  MoreHorizontal, Calendar, LogIn, Clock, Bookmark,
 } from "lucide-react"
 import { useTheme } from "next-themes"
 import BrandLogo from "@/components/brand-logo"
@@ -23,6 +23,8 @@ const NAV_PRIMARY = [
 // More menu (drawer on click)
 const NAV_MORE = [
   { key: "trending",      label: "Trending",       href: "/trending",       icon: Compass },
+  { key: "history",       label: "Riwayat",        href: "/history",        icon: Clock },
+  { key: "bookmarks",     label: "Bookmark",       href: "/bookmarks",      icon: Bookmark },
   { key: "anime-cat",     label: "Katalog Anime",  href: "/anime/catalog",  icon: Sparkles },
   { key: "anime-jadwal",  label: "Jadwal Tayang",  href: "/anime/jadwal",   icon: Calendar },
   { key: "drama-cat",     label: "Katalog Drama",  href: "/drama/catalog",  icon: Theater },
