@@ -24,7 +24,7 @@ export interface MdManga {
 
 export function mdCover(m: MdManga): string {
   const cover = m.relationships.find((r) => r.type === "cover_art")
-  if (!cover?.attributes?.fileName) return "/placeholder.svg"
+  if (!cover?.attributes?.fileName) return "https://via.placeholder.com/512x750/1a1a1a/gold?text=No+Cover"
   return `${COVER}/${m.id}/${cover.attributes.fileName}.512.jpg`
 }
 
