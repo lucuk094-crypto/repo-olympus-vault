@@ -8,6 +8,7 @@ interface YouTubePlayerProps {
   title: string
   thumbnail: string
   channelName: string
+  channelId: string
   genre: string
   type: "film" | "anime"
   duration: number
@@ -17,11 +18,20 @@ interface YouTubePlayerProps {
   startTime?: number
 }
 
+interface VideoClip {
+  videoId: string
+  title: string
+  thumbnail: string
+  duration: number
+  type: 'trailer' | 'clip' | 'episode' | 'full'
+}
+
 export default function YouTubePlayer({
   videoId,
   title,
   thumbnail,
   channelName,
+  channelId,
   genre,
   type,
   duration,
@@ -30,12 +40,40 @@ export default function YouTubePlayer({
   autoplay = false,
   startTime = 0
 }: YouTubePlayerProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const [player, setPlayer] = useState<any>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [bookmarked, setBookmarked] = useState(false)
+  const [activeTab, setActiveTab] = useState<'episodes' | 'clips' | 'trailers'>('episodes')
+  const [clips, setClips] = useState<VideoClip[]>([])
+  const [trailers, setTrailers] = useState<VideoClip[]>([])
+  const [episodes, setEpisodes] = useState<VideoClip[]>([])
+  const [loading, setLoading] = useState(true)
+  const [isFullscreen, setIsFullscreen] = useState(false)
   const progressInterval = useRef<NodeJS.Timeout>()
+
+  // Fetch clips, trailers, and episodes
+  useEffect(() => {
+    async function fetchClips() {
+      try {
+        const res = await fetch(`/api/video-clips?videoId=${videoId}&channelId=${channelId}`)
+        if (res.ok) {
+          const data = await res.json()
+          setClips(data.clips || [])
+          setTrailers(data.trailers || [])
+          setEpisodes(data.episodes || [])
+        }
+      } catch (error) {
+        console.error('Failed to fetch clips:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchClips()
+  }, [videoId, channelId])
 
   // Check bookmark status
   useEffect(() => {
@@ -48,6 +86,45 @@ export default function YouTubePlayer({
     window.addEventListener("bookmarksUpdated", handleBookmarkUpdate)
     return () => window.removeEventListener("bookmarksUpdated", handleBookmarkUpdate)
   }, [videoId])
+
+  // Auto landscape fullscreen on orientation change
+  useEffect(() => {
+    const handleOrientationChange = () => {
+      if (window.screen.orientation) {
+        const orientation = window.screen.orientation.type
+
+        // If landscape and playing, enter fullscreen
+        if ((orientation.includes('landscape')) && isPlaying && containerRef.current) {
+          if (!document.fullscreenElement) {
+            containerRef.current.requestFullscreen?.()
+              .catch(err => console.log('Fullscreen error:', err))
+          }
+        }
+      }
+    }
+
+    window.addEventListener('orientationchange', handleOrientationChange)
+    if (window.screen.orientation) {
+      window.screen.orientation.addEventListener('change', handleOrientationChange)
+    }
+
+    return () => {
+      window.removeEventListener('orientationchange', handleOrientationChange)
+      if (window.screen.orientation) {
+        window.screen.orientation.removeEventListener('change', handleOrientationChange)
+      }
+    }
+  }, [isPlaying])
+
+  // Track fullscreen state
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement)
+    }
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange)
+  }, [])
 
   // Initialize YouTube Player API
   useEffect(() => {
@@ -102,6 +179,7 @@ export default function YouTubePlayer({
             }
           }
         })
+        setPlayer(ytPlayer)
       } else {
         setTimeout(initPlayer, 100)
       }
@@ -180,14 +258,18 @@ export default function YouTubePlayer({
 
   return (
     <div className="youtube-player-wrapper">
-      <div className="player-container" style={{
-        position: "relative",
-        paddingBottom: "56.25%",
-        height: 0,
-        overflow: "hidden",
-        background: "#000",
-        borderRadius: "12px"
-      }}>
+      <div
+        ref={containerRef}
+        className="player-container"
+        style={{
+          position: "relative",
+          paddingBottom: "56.25%",
+          height: 0,
+          overflow: "hidden",
+          background: "#000",
+          borderRadius: "12px"
+        }}
+      >
         <iframe
           ref={iframeRef}
           style={{
@@ -198,7 +280,7 @@ export default function YouTubePlayer({
             height: "100%",
             border: "none"
           }}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
           allowFullScreen
         />
       </div>
@@ -209,10 +291,11 @@ export default function YouTubePlayer({
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        gap: "1rem"
+        gap: "1rem",
+        flexWrap: "wrap"
       }}>
         {/* Progress Info */}
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, minWidth: "200px" }}>
           <div style={{
             display: "flex",
             alignItems: "center",
@@ -289,7 +372,8 @@ export default function YouTubePlayer({
           alignItems: "center",
           gap: "1rem",
           fontSize: "0.875rem",
-          color: "var(--text-2)"
+          color: "var(--text-2)",
+          flexWrap: "wrap"
         }}>
           <span>{channelName}</span>
           {episodeNumber && (
@@ -312,6 +396,292 @@ export default function YouTubePlayer({
           </span>
         </div>
       </div>
+
+      {/* Tabs: Episodes, Clips, Trailers */}
+      {!loading && (episodes.length > 0 || clips.length > 0 || trailers.length > 0) && (
+        <div style={{ marginTop: "2rem" }}>
+          {/* Tab Headers */}
+          <div style={{
+            display: "flex",
+            gap: "0.5rem",
+            borderBottom: "1px solid var(--border)",
+            marginBottom: "1.5rem"
+          }}>
+            {episodes.length > 0 && (
+              <button
+                onClick={() => setActiveTab('episodes')}
+                style={{
+                  padding: "0.75rem 1.5rem",
+                  background: activeTab === 'episodes' ? "var(--gold-soft)" : "transparent",
+                  color: activeTab === 'episodes' ? "var(--gold)" : "var(--text-2)",
+                  border: "none",
+                  borderBottom: activeTab === 'episodes' ? "2px solid var(--gold)" : "2px solid transparent",
+                  fontSize: "0.875rem",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  transition: "all 0.2s ease"
+                }}
+              >
+                Episode ({episodes.length})
+              </button>
+            )}
+
+            {clips.length > 0 && (
+              <button
+                onClick={() => setActiveTab('clips')}
+                style={{
+                  padding: "0.75rem 1.5rem",
+                  background: activeTab === 'clips' ? "var(--gold-soft)" : "transparent",
+                  color: activeTab === 'clips' ? "var(--gold)" : "var(--text-2)",
+                  border: "none",
+                  borderBottom: activeTab === 'clips' ? "2px solid var(--gold)" : "2px solid transparent",
+                  fontSize: "0.875rem",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  transition: "all 0.2s ease"
+                }}
+              >
+                Clip ({clips.length})
+              </button>
+            )}
+
+            {trailers.length > 0 && (
+              <button
+                onClick={() => setActiveTab('trailers')}
+                style={{
+                  padding: "0.75rem 1.5rem",
+                  background: activeTab === 'trailers' ? "var(--gold-soft)" : "transparent",
+                  color: activeTab === 'trailers' ? "var(--gold)" : "var(--text-2)",
+                  border: "none",
+                  borderBottom: activeTab === 'trailers' ? "2px solid var(--gold)" : "2px solid transparent",
+                  fontSize: "0.875rem",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  transition: "all 0.2s ease"
+                }}
+              >
+                Trailer ({trailers.length})
+              </button>
+            )}
+          </div>
+
+          {/* Tab Content */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+            gap: "1rem"
+          }}>
+            {activeTab === 'episodes' && episodes.map((ep) => (
+              <a
+                key={ep.videoId}
+                href={`/watch/${ep.videoId}`}
+                style={{
+                  display: "block",
+                  background: ep.videoId === videoId ? "rgba(212, 175, 55, 0.1)" : "var(--card)",
+                  borderRadius: "8px",
+                  overflow: "hidden",
+                  border: ep.videoId === videoId ? "2px solid var(--gold)" : "1px solid var(--border)",
+                  transition: "all 0.2s ease"
+                }}
+                className="video-clip-card"
+              >
+                <div style={{
+                  position: "relative",
+                  paddingBottom: "56.25%",
+                  background: "#000"
+                }}>
+                  <img
+                    src={ep.thumbnail}
+                    alt={ep.title}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover"
+                    }}
+                  />
+                  <div style={{
+                    position: "absolute",
+                    bottom: "0.5rem",
+                    right: "0.5rem",
+                    background: "rgba(0,0,0,0.8)",
+                    color: "#fff",
+                    padding: "0.25rem 0.5rem",
+                    borderRadius: "4px",
+                    fontSize: "0.75rem"
+                  }}>
+                    {Math.floor(ep.duration / 60)}m
+                  </div>
+                  {ep.videoId === videoId && (
+                    <div style={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      background: "var(--gold)",
+                      color: "#000",
+                      padding: "0.5rem 1rem",
+                      borderRadius: "20px",
+                      fontSize: "0.75rem",
+                      fontWeight: 600
+                    }}>
+                      ▶ Playing
+                    </div>
+                  )}
+                </div>
+                <div style={{ padding: "0.75rem" }}>
+                  <h4 style={{
+                    fontSize: "0.875rem",
+                    fontWeight: 600,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical"
+                  }}>
+                    {ep.title}
+                  </h4>
+                </div>
+              </a>
+            ))}
+
+            {activeTab === 'clips' && clips.map((clip) => (
+              <a
+                key={clip.videoId}
+                href={`/watch/${clip.videoId}`}
+                style={{
+                  display: "block",
+                  background: "var(--card)",
+                  borderRadius: "8px",
+                  overflow: "hidden",
+                  border: "1px solid var(--border)",
+                  transition: "all 0.2s ease"
+                }}
+                className="video-clip-card"
+              >
+                <div style={{
+                  position: "relative",
+                  paddingBottom: "56.25%",
+                  background: "#000"
+                }}>
+                  <img
+                    src={clip.thumbnail}
+                    alt={clip.title}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover"
+                    }}
+                  />
+                  <div style={{
+                    position: "absolute",
+                    bottom: "0.5rem",
+                    right: "0.5rem",
+                    background: "rgba(0,0,0,0.8)",
+                    color: "#fff",
+                    padding: "0.25rem 0.5rem",
+                    borderRadius: "4px",
+                    fontSize: "0.75rem"
+                  }}>
+                    {Math.floor(clip.duration / 60)}m
+                  </div>
+                </div>
+                <div style={{ padding: "0.75rem" }}>
+                  <h4 style={{
+                    fontSize: "0.875rem",
+                    fontWeight: 600,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical"
+                  }}>
+                    {clip.title}
+                  </h4>
+                </div>
+              </a>
+            ))}
+
+            {activeTab === 'trailers' && trailers.map((trailer) => (
+              <a
+                key={trailer.videoId}
+                href={`/watch/${trailer.videoId}`}
+                style={{
+                  display: "block",
+                  background: "var(--card)",
+                  borderRadius: "8px",
+                  overflow: "hidden",
+                  border: "1px solid var(--border)",
+                  transition: "all 0.2s ease"
+                }}
+                className="video-clip-card"
+              >
+                <div style={{
+                  position: "relative",
+                  paddingBottom: "56.25%",
+                  background: "#000"
+                }}>
+                  <img
+                    src={trailer.thumbnail}
+                    alt={trailer.title}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover"
+                    }}
+                  />
+                  <div style={{
+                    position: "absolute",
+                    bottom: "0.5rem",
+                    right: "0.5rem",
+                    background: "rgba(0,0,0,0.8)",
+                    color: "#fff",
+                    padding: "0.25rem 0.5rem",
+                    borderRadius: "4px",
+                    fontSize: "0.75rem"
+                  }}>
+                    {Math.floor(trailer.duration / 60)}m
+                  </div>
+                  <div style={{
+                    position: "absolute",
+                    top: "0.5rem",
+                    left: "0.5rem",
+                    background: "rgba(212, 175, 55, 0.9)",
+                    color: "#000",
+                    padding: "0.25rem 0.5rem",
+                    borderRadius: "4px",
+                    fontSize: "0.75rem",
+                    fontWeight: 600
+                  }}>
+                    TRAILER
+                  </div>
+                </div>
+                <div style={{ padding: "0.75rem" }}>
+                  <h4 style={{
+                    fontSize: "0.875rem",
+                    fontWeight: 600,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical"
+                  }}>
+                    {trailer.title}
+                  </h4>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

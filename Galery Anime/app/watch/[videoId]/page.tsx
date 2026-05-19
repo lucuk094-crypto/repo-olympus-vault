@@ -113,6 +113,7 @@ export default async function VideoWatchPage({ params, searchParams }: Props) {
         title={video.title}
         thumbnail={video.thumbnail}
         channelName={channel.name}
+        channelId={channel.channelId}
         genre={channel.genre}
         type={channel.type}
         duration={video.duration}

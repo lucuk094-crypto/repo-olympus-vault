@@ -2414,3 +2414,15 @@ html.light .vx-auth-input input:focus {
   box-shadow: 0 8px 24px rgba(0,0,0,0.3);
 }
 
+
+/* Video Clip Cards */
+.video-clip-card {
+  transition: all 0.2s ease;
+}
+
+.video-clip-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  border-color: var(--gold) !important;
+}
+

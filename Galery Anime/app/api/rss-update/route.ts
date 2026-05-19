@@ -122,16 +122,16 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const channelId = searchParams.get('channelId')
 
-  // Channel configurations
+  // Channel configurations - now fetch ALL videos (full + trailers)
   const channels = [
-    { id: 'UCApexAction1', name: 'Apex Action', genre: 'action', type: 'film', minDuration: 3600 },
-    { id: 'UCJagoanDonghua', name: 'Jagoan Donghua', genre: 'action', type: 'anime', minDuration: 1200 },
-    { id: 'UCHitFlix-RC', name: 'HitFlix', genre: 'action', type: 'film', minDuration: 3600 },
-    { id: 'UCMovieSphereHorror-SciFi', name: 'MovieSphere Horror', genre: 'horror', type: 'film', minDuration: 3600 },
-    { id: 'UCAmazingAnimeMan', name: 'Amazing Anime Man', genre: 'action', type: 'anime', minDuration: 1200 },
-    { id: 'UCSuperheroFXLGames', name: 'Superhero FXL', genre: 'action', type: 'film', minDuration: 3600 },
-    { id: 'UChotanime-ri9zc', name: 'Hot Anime', genre: 'action', type: 'anime', minDuration: 1200 },
-    { id: 'UCFILVOXFOX', name: 'FILVOX FOX', genre: 'action', type: 'film', minDuration: 3600 }
+    { id: 'UCApexAction1', name: 'Apex Action', genre: 'action', type: 'film', minDuration: 60 },
+    { id: 'UCJagoanDonghua', name: 'Jagoan Donghua', genre: 'action', type: 'anime', minDuration: 60 },
+    { id: 'UCHitFlix-RC', name: 'HitFlix', genre: 'action', type: 'film', minDuration: 60 },
+    { id: 'UCMovieSphereHorror-SciFi', name: 'MovieSphere Horror', genre: 'horror', type: 'film', minDuration: 60 },
+    { id: 'UCAmazingAnimeMan', name: 'Amazing Anime Man', genre: 'action', type: 'anime', minDuration: 60 },
+    { id: 'UCSuperheroFXLGames', name: 'Superhero FXL', genre: 'action', type: 'film', minDuration: 60 },
+    { id: 'UChotanime-ri9zc', name: 'Hot Anime', genre: 'action', type: 'anime', minDuration: 60 },
+    { id: 'UCFILVOXFOX', name: 'FILVOX FOX', genre: 'action', type: 'film', minDuration: 60 }
   ]
 
   try {
