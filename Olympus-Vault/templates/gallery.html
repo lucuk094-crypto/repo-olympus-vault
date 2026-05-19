@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>Galeri - Olympus Vault</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="greek-border-top"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <i class="fas fa-landmark"></i> OLYMPUS VAULT
+        </div>
+        <div class="navbar-menu">
+            <a href="/dashboard" class="navbar-link"><i class="fas fa-home"></i> Beranda</a>
+            <a href="/gallery" class="navbar-link"><i class="fas fa-images"></i> Galeri</a>
+            <a href="/notifications" class="navbar-link"><i class="fas fa-bell"></i> Notifikasi</a>
+            <span class="navbar-link" style="color: var(--gold);">
+                <i class="fas fa-user"></i> {{ username }}
+            </span>
+            <a href="/logout" class="btn btn-secondary" style="padding: 8px 16px;">
+                <i class="fas fa-sign-out-alt"></i> Keluar
+            </a>
+        </div>
+    </nav>
+
+    <main style="padding: 100px 2rem 80px; max-width: 1400px; margin: 0 auto;">
+        <div class="card" style="margin-bottom: 2rem;">
+            <h1 style="color: var(--gold); margin-bottom: 0.5rem;">
+                <i class="fas fa-images"></i> Galeri Foto & Video
+            </h1>
+            <p style="color: var(--marble);">Lihat dan putar media seperti galeri HP</p>
+        </div>
+
+        <!-- Filter -->
+        <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+            <button class="btn btn-primary" onclick="filterGallery('all')">
+                <i class="fas fa-th"></i> Semua
+            </button>
+            <button class="btn btn-secondary" onclick="filterGallery('images')">
+                <i class="fas fa-image"></i> Foto
+            </button>
+            <button class="btn btn-secondary" onclick="filterGallery('videos')">
+                <i class="fas fa-video"></i> Video
+            </button>
+        </div>
+
+        <!-- Gallery Grid -->
+        <div class="gallery-grid">
+            {% for file in files %}
+            <div class="gallery-item" data-category="{{ file.category }}" onclick="viewMedia({{ file.id }}, '{{ file.category }}')">
+                {% if file.thumbnail %}
+                <img src="/static/thumbnails/{{ file.thumbnail }}" alt="{{ file.original_name }}">
+                {% elif file.category == 'images' %}
+                <img src="/view/{{ file.id }}" alt="{{ file.original_name }}">
+                {% elif file.category == 'videos' %}
+                <video src="/view/{{ file.id }}" preload="metadata"></video>
+                <div class="play-icon"><i class="fas fa-play-circle"></i></div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if files|length == 0 %}
+        <div class="card" style="text-align: center; padding: 3rem;">
+            <div style="font-size: 4rem; color: var(--gold-dark); margin-bottom: 1rem;">
+                <i class="fas fa-images"></i>
+            </div>
+            <h3 style="color: var(--gold); margin-bottom: 0.5rem;">Belum Ada Media</h3>
+            <p style="color: var(--marble);">Upload foto atau video untuk melihatnya di galeri</p>
+            <a href="/dashboard" class="btn btn-primary" style="margin-top: 1rem;">
+                <i class="fas fa-cloud-upload-alt"></i> Upload Sekarang
+            </a>
+        </div>
+        {% endif %}
+    </main>
+
+    <!-- Modal untuk view media -->
+    <div class="modal" id="viewModal">
+        <span class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></span>
+        <div class="modal-content" id="modalContent"></div>
+    </div>
+
+    <div class="greek-border-bottom"></div>
+
+    <script>
+        function filterGallery(category) {
+            const items = document.querySelectorAll('.gallery-item');
+            items.forEach(item => {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function viewMedia(fileId, category) {
+            const modal = document.getElementById('viewModal');
+            const modalContent = document.getElementById('modalContent');
+
+            if (category === 'images') {
+                modalContent.innerHTML = `<img src="/view/${fileId}" style="max-width: 100%; max-height: 90vh; border-radius: 10px;">`;
+            } else if (category === 'videos') {
+                modalContent.innerHTML = `<video controls autoplay style="max-width: 100%; max-height: 90vh; border-radius: 10px;">
+                    <source src="/view/${fileId}" type="video/mp4">
+                </video>`;
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('viewModal');
+            modal.classList.remove('active');
+            document.getElementById('modalContent').innerHTML = '';
+        }
+
+        // Close dengan ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>Dashboard - Olympus Vault</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="manifest" href="/static/manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="greek-border-top"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <i class="fas fa-landmark"></i> OLYMPUS VAULT
+        </div>
+        <div class="navbar-menu">
+            <a href="/dashboard" class="navbar-link"><i class="fas fa-home"></i> Beranda</a>
+            <a href="/gallery" class="navbar-link"><i class="fas fa-images"></i> Galeri</a>
+            <a href="/notifications" class="navbar-link notification-badge">
+                <i class="fas fa-bell"></i> Notifikasi
+                {% if notif_count > 0 %}
+                <span class="badge">{{ notif_count }}</span>
+                {% endif %}
+            </a>
+            <span class="navbar-link" style="color: var(--gold);">
+                <i class="fas fa-user"></i> {{ username }}
+            </span>
+            <a href="/logout" class="btn btn-secondary" style="padding: 8px 16px;">
+                <i class="fas fa-sign-out-alt"></i> Keluar
+            </a>
+        </div>
+    </nav>
+
+    <main style="padding: 100px 2rem 80px; max-width: 1400px; margin: 0 auto;">
+        <!-- Storage Info -->
+        <div class="card" style="margin-bottom: 2rem;">
+            <h2 style="color: var(--gold); margin-bottom: 1rem;">
+                <i class="fas fa-database"></i> Penyimpanan
+            </h2>
+            <div class="storage-bar">
+                <div class="storage-fill" style="width: {{ (storage_used / storage_limit * 100)|round(2) }}%;">
+                    {{ (storage_used / storage_limit * 100)|round(2) }}%
+                </div>
+            </div>
+            <p style="margin-top: 0.5rem; color: var(--marble);">
+                <strong>{{ (storage_used / 1024 / 1024 / 1024)|round(2) }} GB</strong> dari
+                <strong>{{ (storage_limit / 1024 / 1024 / 1024)|round(0) }} TB</strong> terpakai
+            </p>
+        </div>
+
+        <!-- Upload Area -->
+        <div class="card" style="margin-bottom: 2rem;">
+            <h2 style="color: var(--gold); margin-bottom: 1.5rem;">
+                <i class="fas fa-cloud-upload-alt"></i> Upload File
+            </h2>
+
+            <!-- Tab Upload -->
+            <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="showUploadTab('file')">
+                    <i class="fas fa-file"></i> Upload File
+                </button>
+                <button class="btn btn-secondary" onclick="showUploadTab('apk')">
+                    <i class="fab fa-android"></i> Upload APK (URL)
+                </button>
+                <button class="btn btn-secondary" onclick="showUploadTab('project')">
+                    <i class="fas fa-globe"></i> Tambah Project Website
+                </button>
+            </div>
+
+            <!-- Upload File Biasa -->
+            <div id="upload-file" class="upload-area">
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                    <h3 style="color: var(--gold); margin-bottom: 0.5rem;">Pilih File untuk Diupload</h3>
+                    <p style="color: var(--marble); margin-bottom: 1rem;">
+                        Drag & drop atau klik untuk memilih file
+                    </p>
+                    <input type="file" id="fileInput" name="file" style="display: none;">
+                    <button type="button" class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-folder-open"></i> Pilih File
+                    </button>
+                    <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--gold-dark);">
+                        Support: Foto, Video, Dokumen, APK, ZIP, dan lainnya (Max 1TB)
+                    </p>
+                </form>
+            </div>
+
+            <!-- Upload APK via URL -->
+            <div id="upload-apk" class="upload-area" style="display: none;">
+                <form id="apkForm">
+                    <div class="upload-icon"><i class="fab fa-android"></i></div>
+                    <h3 style="color: var(--gold); margin-bottom: 1rem;">Download APK dari URL</h3>
+                    <input type="text" id="apkUrl" placeholder="https://example.com/app.apk"
+                           style="width: 100%; padding: 12px; border-radius: 10px; border: 2px solid var(--gold-dark); background: var(--dark-light); color: var(--marble); margin-bottom: 1rem;">
+                    <input type="text" id="apkName" placeholder="Nama APK"
+                           style="width: 100%; padding: 12px; border-radius: 10px; border: 2px solid var(--gold-dark); background: var(--dark-light); color: var(--marble); margin-bottom: 1rem;">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-download"></i> Download & Simpan
+                    </button>
+                </form>
+            </div>
+
+            <!-- Upload Project Website -->
+            <div id="upload-project" class="upload-area" style="display: none;">
+                <form id="projectForm">
+                    <div class="upload-icon"><i class="fas fa-globe"></i></div>
+                    <h3 style="color: var(--gold); margin-bottom: 1rem;">Tambah Project Website</h3>
+                    <input type="text" id="projectUrl" placeholder="https://example.com"
+                           style="width: 100%; padding: 12px; border-radius: 10px; border: 2px solid var(--gold-dark); background: var(--dark-light); color: var(--marble); margin-bottom: 1rem;">
+                    <input type="text" id="projectName" placeholder="Nama Project"
+                           style="width: 100%; padding: 12px; border-radius: 10px; border: 2px solid var(--gold-dark); background: var(--dark-light); color: var(--marble); margin-bottom: 1rem;">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Tambah Project
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- File List -->
+        <div class="card">
+            <h2 style="color: var(--gold); margin-bottom: 1.5rem;">
+                <i class="fas fa-folder-open"></i> File Saya
+            </h2>
+
+            <!-- Filter -->
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                <button class="btn btn-secondary" onclick="filterFiles('all')">
+                    <i class="fas fa-th"></i> Semua
+                </button>
+                <button class="btn btn-secondary" onclick="filterFiles('images')">
+                    <i class="fas fa-image"></i> Foto
+                </button>
+                <button class="btn btn-secondary" onclick="filterFiles('videos')">
+                    <i class="fas fa-video"></i> Video
+                </button>
+                <button class="btn btn-secondary" onclick="filterFiles('documents')">
+                    <i class="fas fa-file-alt"></i> Dokumen
+                </button>
+                <button class="btn btn-secondary" onclick="filterFiles('apk')">
+                    <i class="fab fa-android"></i> APK
+                </button>
+                <button class="btn btn-secondary" onclick="filterFiles('projects')">
+                    <i class="fas fa-globe"></i> Project
+                </button>
+            </div>
+
+            <div class="file-grid" id="fileGrid">
+                {% for file in files %}
+                <div class="file-card" data-category="{{ file.category }}">
+                    {% if file.thumbnail %}
+                    <img src="/static/thumbnails/{{ file.thumbnail }}" class="file-thumbnail" alt="{{ file.original_name }}">
+                    {% elif file.category == 'images' %}
+                    <div class="file-icon"><i class="fas fa-image"></i></div>
+                    {% elif file.category == 'videos' %}
+                    <div class="file-icon"><i class="fas fa-video"></i></div>
+                    {% elif file.category == 'documents' %}
+                    <div class="file-icon"><i class="fas fa-file-alt"></i></div>
+                    {% elif file.category == 'apk' %}
+                    <div class="file-icon"><i class="fab fa-android"></i></div>
+                    {% elif file.category == 'projects' %}
+                    <div class="file-icon"><i class="fas fa-globe"></i></div>
+                    {% else %}
+                    <div class="file-icon"><i class="fas fa-file"></i></div>
+                    {% endif %}
+
+                    <div class="file-name">{{ file.original_name }}</div>
+                    <div class="file-info">
+                        <span>{{ (file.file_size / 1024 / 1024)|round(2) }} MB</span>
+                        <span>{{ file.upload_date[:10] }}</span>
+                    </div>
+
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                        {% if file.url_link %}
+                        <a href="{{ file.url_link }}" target="_blank" class="btn btn-primary" style="flex: 1; padding: 8px; font-size: 0.9rem;">
+                            <i class="fas fa-external-link-alt"></i> Buka
+                        </a>
+                        {% elif file.category in ['images', 'videos'] %}
+                        <button onclick="viewFile({{ file.id }})" class="btn btn-primary" style="flex: 1; padding: 8px; font-size: 0.9rem;">
+                            <i class="fas fa-eye"></i> Lihat
+                        </button>
+                        {% else %}
+                        <a href="/download/{{ file.id }}" class="btn btn-primary" style="flex: 1; padding: 8px; font-size: 0.9rem;">
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                        {% endif %}
+                        <button onclick="shareFile({{ file.id }})" class="share-btn" style="padding: 8px 12px;">
+                            <i class="fas fa-share-alt"></i>
+                        </button>
+                        <button onclick="deleteFile({{ file.id }})" class="btn btn-secondary" style="padding: 8px 12px; background: #f44336;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal untuk view gambar/video -->
+    <div class="modal" id="viewModal">
+        <span class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></span>
+        <div class="modal-content" id="modalContent"></div>
+    </div>
+
+    <div class="greek-border-bottom"></div>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

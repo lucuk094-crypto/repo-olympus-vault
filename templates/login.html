@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masuk - Olympus Vault</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="greek-border-top"></div>
+    
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="temple-icon">🏛️</div>
+                <h1>Pintu Gerbang Olympus</h1>
+                <p class="greek-text">Είσοδος στο Ιερό Αρχείο</p>
+            </div>
+            
+            {% if error %}
+            <div class="alert alert-error">
+                <span class="alert-icon">⚠️</span>
+                {{ error }}
+            </div>
+            {% endif %}
+            
+            {% if request.args.get('success') %}
+            <div class="alert alert-success">
+                <span class="alert-icon">✅</span>
+                Pendaftaran berhasil! Silakan masuk.
+            </div>
+            {% endif %}
+            
+            <form action="/login" method="POST" class="auth-form">
+                <div class="form-group">
+                    <label for="username">
+                        <span class="label-icon">👤</span>
+                        Nama Pengguna
+                    </label>
+                    <input type="text" id="username" name="username" required placeholder="Masukkan username..." autocomplete="username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">
+                        <span class="label-icon">🔑</span>
+                        Kunci Rahasia
+                    </label>
+                    <input type="password" id="password" name="password" required placeholder="Masukkan password..." autocomplete="current-password">
+                </div>
+                
+                <button type="submit" class="btn-greek btn-primary btn-full">
+                    <span class="btn-icon">⚡</span>
+                    Masuk ke Kuil
+                </button>
+            </form>
+            
+            <div class="auth-footer">
+                <p>Belum punya akun? <a href="/register">Daftar di sini</a></p>
+                <a href="/" class="back-link">← Kembali ke Beranda</a>
+            </div>
+        </div>
+        
+        <div class="auth-decoration">
+            <div class="column-mini"></div>
+            <div class="column-mini"></div>
+        </div>
+    </div>
+    
+    <div class="greek-border-bottom"></div>
+</body>
+</html>

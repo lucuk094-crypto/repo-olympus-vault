@@ -1,0 +1,92 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar - Olympus Vault</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="greek-border-top"></div>
+    
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="temple-icon">🏛️</div>
+                <h1>Pendaftaran Olympus</h1>
+                <p class="greek-text">Εγγραφή στο Ιερό Αρχείο</p>
+            </div>
+            
+            {% if error %}
+            <div class="alert alert-error">
+                <span class="alert-icon">⚠️</span>
+                {{ error }}
+            </div>
+            {% endif %}
+            
+            <form action="/register" method="POST" class="auth-form">
+                <div class="form-group">
+                    <label for="username">
+                        <span class="label-icon">👤</span>
+                        Nama Pengguna
+                    </label>
+                    <input type="text" id="username" name="username" required minlength="4" placeholder="Min. 4 karakter..." autocomplete="username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">
+                        <span class="label-icon">🔑</span>
+                        Kunci Rahasia
+                    </label>
+                    <input type="password" id="password" name="password" required minlength="8" placeholder="Min. 8 karakter..." autocomplete="new-password">
+                </div>
+                
+                <div class="password-strength">
+                    <div class="strength-bar" id="strengthBar"></div>
+                    <span class="strength-text" id="strengthText">Kekuatan Password</span>
+                </div>
+                
+                <button type="submit" class="btn-greek btn-primary btn-full">
+                    <span class="btn-icon">🏛️</span>
+                    Daftarkan Akun
+                </button>
+            </form>
+            
+            <div class="auth-footer">
+                <p>Sudah punya akun? <a href="/login">Masuk di sini</a></p>
+                <a href="/" class="back-link">← Kembali ke Beranda</a>
+            </div>
+        </div>
+        
+        <div class="auth-decoration">
+            <div class="column-mini"></div>
+            <div class="column-mini"></div>
+        </div>
+    </div>
+    
+    <div class="greek-border-bottom"></div>
+    
+    <script>
+        document.getElementById('password').addEventListener('input', function(e) {
+            const password = e.target.value;
+            const strengthBar = document.getElementById('strengthBar');
+            const strengthText = document.getElementById('strengthText');
+            
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (password.length >= 12) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            
+            const levels = ['', 'Lemah', 'Sedang', 'Kuat', 'Sangat Kuat', 'Legenda'];
+            const colors = ['#8B4513', '#CD853F', '#DAA520', '#FFD700', '#FFA500'];
+            
+            strengthBar.style.width = (strength * 20) + '%';
+            strengthBar.style.background = colors[strength] || '#8B4513';
+            strengthText.textContent = levels[strength] || 'Kekuatan Password';
+        });
+    </script>
+</body>
+</html>

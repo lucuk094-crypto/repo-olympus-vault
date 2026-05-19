@@ -1,0 +1,125 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Olympus Vault</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="greek-border-top"></div>
+    
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="brand-icon">🏛️</span>
+            <span class="brand-text">OLYMPUS VAULT</span>
+        </div>
+        <div class="nav-user">
+            <span class="user-greeting">Selamat datang, <strong>{{ username }}</strong></span>
+            <a href="/logout" class="btn-greek btn-small btn-logout">
+                <span class="btn-icon">🚪</span>
+                Keluar
+            </a>
+        </div>
+    </nav>
+    
+    <main class="dashboard">
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-icon">📁</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="totalFiles">0</span>
+                    <span class="stat-label">Total File</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💾</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="totalSize">0 KB</span>
+                    <span class="stat-label">Total Ukuran</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="upload-section">
+            <div class="upload-card">
+                <h2 class="section-title">
+                    <span class="title-icon">⚡</span>
+                    Upload File Baru
+                </h2>
+                <form id="uploadForm" class="upload-form">
+                    <div class="upload-zone" id="dropZone">
+                        <div class="upload-icon">📤</div>
+                        <p class="upload-text">Seret file ke sini atau klik untuk memilih</p>
+                        <p class="upload-hint">Mendukung: PDF, Word, Excel, Gambar, Video, APK (Maks 500MB)</p>
+                        <input type="file" id="fileInput" name="file" multiple hidden>
+                    </div>
+                    <div class="upload-progress" id="uploadProgress" style="display: none;">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <span class="progress-text" id="progressText">Mengupload...</span>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="files-section">
+            <div class="files-header">
+                <h2 class="section-title">
+                    <span class="title-icon">📜</span>
+                    Arsip File Saya
+                </h2>
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all">Semua</button>
+                    <button class="filter-tab" data-filter="documents">📄 Dokumen</button>
+                    <button class="filter-tab" data-filter="images">🖼️ Gambar</button>
+                    <button class="filter-tab" data-filter="videos">🎬 Video</button>
+                    <button class="filter-tab" data-filter="apk">📱 APK</button>
+                </div>
+            </div>
+            
+            <div class="files-grid" id="filesGrid">
+                {% for file in files %}
+                <div class="file-card" data-category="{{ file[4] }}">
+                    <div class="file-icon">{{ '📄' if file[4] == 'documents' else ('🖼️' if file[4] == 'images' else ('🎬' if file[4] == 'videos' else ('📱' if file[4] == 'apk' else '📦'))) }}</div>
+                    <div class="file-info">
+                        <h4 class="file-name" title="{{ file[1] }}">{{ file[1][:30] }}{% if file[1]|length > 30 %}...{% endif %}</h4>
+                        <p class="file-meta">
+                            <span class="file-size">{{ (file[2] / 1024)|round(1) }} KB</span>
+                            <span class="file-date">{{ file[5][:10] if file[5] else '-' }}</span>
+                        </p>
+                    </div>
+                    <div class="file-actions">
+                        <a href="/download/{{ file[0] }}" class="btn-action btn-download" title="Download">
+                            ⬇️
+                        </a>
+                        <button onclick="deleteFile({{ file[0] }})" class="btn-action btn-delete" title="Hapus">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <p>Belum ada file tersimpan</p>
+                    <p class="empty-hint">Upload file pertamamu!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </main>
+    
+    <footer class="greek-footer">
+        <div class="footer-pattern"></div>
+        <p>Olympus Vault © 2026 - Penjaga Arsip Olympus</p>
+    </footer>
+    
+    <div class="greek-border-bottom"></div>
+    
+    <div class="toast" id="toast"></div>
+    
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

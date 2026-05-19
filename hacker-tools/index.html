@@ -1,0 +1,514 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VAN313.DEV - Hacker Tools</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: #0a0a0a;
+            color: #888;
+            min-height: 100vh;
+            font-size: 13px;
+        }
+
+        a {
+            color: #666;
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: #aaa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            border-bottom: 1px solid #222;
+            padding: 15px 0;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ccc;
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: #555;
+        }
+
+        nav {
+            display: flex;
+            gap: 5px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            color: #666;
+            padding: 8px 15px;
+            font-family: inherit;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid #222;
+            transition: all 0.2s;
+        }
+
+        nav button:hover, nav button.active {
+            color: #ccc;
+            border-color: #444;
+            background: #111;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 11px;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 25px 0 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 8px;
+        }
+
+        .tool-item {
+            background: #0f0f0f;
+            border: 1px solid #1a1a1a;
+            padding: 12px 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tool-item:hover {
+            border-color: #333;
+            background: #111;
+        }
+
+        .tool-item .cmd {
+            color: #777;
+            font-size: 12px;
+        }
+
+        .tool-item .desc {
+            color: #555;
+            font-size: 11px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: block;
+        }
+
+        .modal-content {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 25px;
+            background: #0a0a0a;
+            border: 1px solid #222;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .modal-header h2 {
+            font-size: 14px;
+            color: #aaa;
+            font-weight: 500;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: #aaa;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #666;
+            font-size: 11px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            background: #0f0f0f;
+            border: 1px solid #222;
+            color: #aaa;
+            padding: 10px 12px;
+            font-family: inherit;
+            font-size: 12px;
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #444;
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: #111;
+            border: 1px solid #333;
+            color: #888;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #1a1a1a;
+            color: #aaa;
+        }
+
+        .btn-primary {
+            background: #1a1a1a;
+            border-color: #444;
+            color: #aaa;
+        }
+
+        .output {
+            background: #050505;
+            border: 1px solid #1a1a1a;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #777;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .output.success {
+            color: #7a7;
+        }
+
+        .output.error {
+            color: #a77;
+        }
+
+        .output .highlight {
+            color: #aaa;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .btn-group .btn {
+            padding: 6px 12px;
+            font-size: 11px;
+        }
+
+        footer {
+            border-top: 1px solid #1a1a1a;
+            padding: 20px 0;
+            margin-top: 40px;
+            text-align: center;
+            color: #444;
+            font-size: 11px;
+        }
+
+        .info-box {
+            background: #0f0f0f;
+            border: 1px solid #1a1a1a;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .info-box code {
+            background: #050505;
+            padding: 2px 6px;
+            color: #888;
+        }
+
+        @media (max-width: 768px) {
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">VAN313<span>.DEV</span></div>
+            <nav>
+                <button class="active" data-tab="recon">Recon</button>
+                <button data-tab="exploit">Exploit</button>
+                <button data-tab="crypto">Crypto</button>
+                <button data-tab="shell">Shell</button>
+                <button data-tab="encode">Encode</button>
+                <button data-tab="tools">Tools</button>
+            </nav>
+        </header>
+
+        <main>
+            <!-- RECON -->
+            <section id="recon" class="tab-content active">
+                <div class="info-box">
+                    Tools untuk reconnaissance dan information gathering. Semua request dijalankan dari browser.
+                </div>
+                
+                <div class="section-title">Network Intel</div>
+                <div class="tools-grid">
+                    <div class="tool-item" onclick="openTool('ipinfo')">
+                        <span class="cmd">IP Info</span>
+                        <span class="desc">Check IP details</span>
+                    </div>
+                    <div class="tool-item" onclick="openTool('dnslookup')">
+                        <span class="cmd">DNS Lookup</span>
+                        <span class="desc">Query DNS records</span>
+                    </div>
+                    <div class="tool-item" onclick="openTool('whois')">
+                        <span class="cmd">WHOIS</span>
+                        <span class="desc">Domain info</span>
+                    </div>
+                    <div class="tool-item" onclick="openTool='headers'')">
+                        <span class="cmd">HTTP Headers</span>
+                        <span class="desc">Check response headers</span>
+                    </div>
+                </div>
+
+                <div class="section-title">Port Scanner</div>
+                <div class="tools-grid">
+                    <div class="tool-item" onclick="openTool('portscan')">
+                        <span class="cmd">Port Scan</span>
+                        <span class="desc">Scan common ports</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- EXPLOIT -->
+            <section id="exploit" class="tab-content">
+                <div class="info-box">
+                    Kumpulan payload untuk testing keamanan web application.
+                </div>
+                
+                <div class="section-title">Injection</div>
+                <div class="tools-grid">
+                    <div class="tool-item" onclick="openTool('xss')">
+                        <span class="cmd">XSS</span>
+                        <span class="desc">Cross-site scripting</span>
+                    </div>
+                    <div class="tool-item" onclick="openTool('sqli')">
+                        <span class="cmd">SQLi</span>
+                        <span class="desc">SQL injection</span>
+                    </div>
+                    <div class="tool-item" onclick="openTool('lfi')">
+                        <span class="cmd">LFI/RFI</span>
+                        <span class="desc">File inclusion</span>
+                    </div>
+                    <div class="tool-item" onclick="openTool='cmdi'')">
+                        <span class="cmd">CMDi</span>
+                        <span class="desc">Command injection</span>
+                    </div>
+                </div>
+
+                <div class="section-title">Other</div>
+                <div class="tools-grid">
+                    <div class="tool-item" onclick="openTool('ssrf')">
+                        <span class="cmd">SSRF</span>
+                        <span class="desc">Server-side request</span>
+                    </div>
+                    <div class="tool-item" onclick="openTool('redirect')">
+                        <span class="cmd">Open Redirect</span>
+                        <span class="desc">URL redirection</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CRYPTO -->
+            <section id="crypto" class="tab-content">
+                <div class="info-box">
+                    Tools untuk mengolah hash dan enkripsi.
+                </div>
+                
+                <div class="section-title">Hash Tools</div>
+                <div class="tools-grid">
+                    <div class="tool-item" onclick="openTool('hashgen')">
+                        <span class="cmd">Hash Generator</span>
+                        <span class="desc">MD5, SHA1, SHA256</span>
+                    </div>
+                    <div class="tool-item" onclick="openTool('hashid')">
+                        <span class="cmd">Hash Identifier</span>
+                        <span class="desc">Identify hash type</span>
+                    </div>
+                </div>
+
+                <div class="section-title">JWT</div>
+                <div class="tools-grid">
+                    <div class="tool-item" onclick="openTool('jwtdecode')">
+                        <span class="cmd">JWT Decode</span>
+                        <span class="desc">Decode JWT token</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SHELL -->
+            <section id="shell" class="tab-content">
+                <div class="info-box">
+                    Reverse shell dan bind shell generator untuk berbagai bahasa pemrograman.
+                </div>
+                
+                <div class="section-title">Reverse Shell</div>
+                <div class="tools-grid">
+                    <div class="tool-item" onclick="openTool('revshell')">
+                        <span class="cmd">Generator</span>
+                        <span class="desc">Generate revshell</span>
+                    </div>
+                </div>
+
+                <div class="section-title">Webshell</div>
+                <div class="tools-grid">
+                    <div class="tool-item" onclick="openTool='webshell'')">
+                        <span class="cmd">Mini Shell</span>
+                        <span class="desc">PHP/ASP webshell</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ENCODE -->
+            <section id="encode" class="tab-content">
+                <div class="info-box">
+                    Encoder dan decoder untuk berbagai format.
+                </div>
+                
+                <div class="section-title">Encoding</div>
+                <div class="tools-grid">
+                    <div class="tool-item" onclick="openTool('base64')">
+                        <span class="cmd">Base64</span>
+                        <span class="desc">Encode/Decode</span>
+                    </div>
+                    <div class="tool-item" onclick="openTool('urlenc')">
+                        <span class="cmd">URL Encode</span>
+                        <span class="desc">Encode/Decode</span>
+                    </div>
+                    <div class="tool-item" onclick="openTool('hexenc')">
+                        <span class="cmd">Hex</span>
+                        <span class="desc">Encode/Decode</span>
+                    </div>
+                    <div class="tool-item" onclick="openTool('binenc')">
+                        <span class="cmd">Binary</span>
+                        <span class="desc">Text to binary</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TOOLS -->
+            <section id="tools" class="tab-content">
+                <div class="info-box">
+                    Utility tools lainnya.
+                </div>
+                
+                <div class="section-title">Utility</div>
+                <div class="tools-grid">
+                    <div class="tool-item" onclick="openTool='passwordgen'')">
+                        <span class="cmd">Password Gen</span>
+                        <span class="desc">Random password</span>
+                    </div>
+                    <div class="tool-item" onclick="openTool='uuidgen'')">
+                        <span class="cmd">UUID Gen</span>
+                        <span class="desc">Generate UUID</span>
+                    </div>
+                    <div class="tool-item" onclick="openTool('timestamp')">
+                        <span class="cmd">Timestamp</span>
+                        <span class="desc">Unix timestamp</span>
+                    </div>
+                    <div class="tool-item" onclick="openTool('regex')">
+                        <span class="cmd">Regex Test</span>
+                        <span class="desc">Test regex</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            VAN313.DEV - Hacker Tools Suite
+        </footer>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Tool</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

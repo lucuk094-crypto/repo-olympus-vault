@@ -1,0 +1,178 @@
+import { notFound } from "next/navigation"
+import { Star } from "lucide-react"
+import { getTvDetail, pickTrailer, tmdbImg, type TmdbTv } from "@/lib/api/tmdb"
+import { findChannelSeries } from "@/lib/api/channels"
+import SectionRow from "@/components/section-row"
+import Poster from "@/components/poster"
+import Translatable from "@/components/translatable"
+import FavoriteButton from "@/components/favorite-button"
+import { TrailerButton } from "@/components/trailer-button"
+import EpisodePlayer from "@/components/episode-player"
+import YoutubeSearchPlayer from "@/components/youtube-search-player"
+
+interface Props { params: Promise<{ id: string }> }
+
+export const revalidate = 3600
+
+export async function generateMetadata({ params }: Props) {
+  const { id } = await params
+  const m = await getTvDetail(id)
+  if (!m) return { title: "Drama tidak ditemukan" }
+  return { title: `${m.name} — VanX Stream`, description: m.overview?.slice(0, 160) }
+}
+
+export default async function DramaDetail({ params }: Props) {
+  const { id } = await params
+  const m = await getTvDetail(id)
+  if (!m) notFound()
+
+  const trailer = pickTrailer((m as any).videos?.results)
+  const cast = (m as any).credits?.cast || []
+  const recs: TmdbTv[] = (m as any).recommendations?.results || []
+  const similar: TmdbTv[] = (m as any).similar?.results || []
+  const channelMatch = await findChannelSeries([m.name, m.original_name])
+
+  const favItem = {
+    type: "tv" as const,
+    id: String(m.id),
+    title: m.name,
+    poster: tmdbImg(m.poster_path, "w500"),
+    score: m.vote_average,
+    sub: `Drama · ${m.first_air_date?.slice(0, 4) || ""}`,
+    ts: 0,
+  }
+
+  return (
+    <>
+      <div className="vx-hero" style={{ minHeight: "min(60vh, 540px)" }}>
+        <div className="vx-hero-bg" style={{ backgroundImage: `url(${tmdbImg(m.backdrop_path, "original")})` }} />
+        <div className="vx-hero-overlay" />
+        <div className="vx-hero-content" style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "1.5rem", alignItems: "flex-end", maxWidth: 1200 }}>
+          <img
+            src={tmdbImg(m.poster_path, "w500")}
+            alt={m.name}
+            style={{ width: 180, aspectRatio: "2/3", objectFit: "cover", borderRadius: 6, border: "2px solid var(--gold)", boxShadow: "0 12px 30px rgba(0,0,0,0.5)" }}
+          />
+          <div style={{ minWidth: 0 }}>
+            <div className="vx-hero-eyebrow">Drama {m.origin_country.length ? `· ${m.origin_country.join(", ")}` : ""}</div>
+            <h1 className="vx-hero-title">
+              {m.name}
+              {m.original_name !== m.name && <> · <em>{m.original_name}</em></>}
+            </h1>
+            <div className="vx-hero-meta">
+              <span style={{ color: "var(--gold)", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 4 }}>
+                <Star size={12} fill="currentColor" /> {m.vote_average.toFixed(1)}
+              </span>
+              <span className="vx-hero-meta-divider">{m.first_air_date?.slice(0, 4)}</span>
+              <span className="vx-hero-meta-divider">{m.number_of_seasons} Season</span>
+              <span className="vx-hero-meta-divider">{m.number_of_episodes} Episode</span>
+              {m.episode_run_time?.[0] && <span className="vx-hero-meta-divider">{m.episode_run_time[0]} mnt</span>}
+              <span className="vx-hero-meta-divider" style={{ color: m.in_production ? "var(--gold)" : "var(--text-3)" }}>
+                {m.in_production ? "On Air" : "Tamat"}
+              </span>
+            </div>
+            {m.genres.length > 0 && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6, margin: "0.5rem 0 1rem" }}>
+                {m.genres.map((g) => (
+                  <span key={g.id} style={{
+                    background: "var(--gold-soft)", border: "1px solid var(--gold)",
+                    color: "var(--gold)", padding: "0.18rem 0.7rem", borderRadius: 4,
+                    fontFamily: "var(--serif)", fontSize: "0.7rem", fontWeight: 600,
+                    letterSpacing: "0.06em", textTransform: "uppercase",
+                  }}>{g.name}</span>
+                ))}
+              </div>
+            )}
+            <div className="vx-hero-actions">
+              {trailer?.key && <TrailerButton youtubeId={trailer.key} title={m.name} />}
+              <FavoriteButton item={favItem} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {m.overview && (
+        <section className="vx-section" style={{ maxWidth: 1100 }}>
+          <div className="vx-section-head">
+            <div className="vx-section-title-group">
+              <div className="vx-section-eyebrow">Sinopsis</div>
+              <h2 className="vx-section-title">Cerita</h2>
+            </div>
+          </div>
+          <Translatable text={m.overview} auto className="vx-hero-sub" style={{ WebkitLineClamp: "unset", display: "block", maxWidth: 900, fontSize: "1rem" }} />
+        </section>
+      )}
+
+      {/* Channel episodes (YouTube) — channelMatch first, fallback to public search */}
+      {channelMatch && channelMatch.episodes.length > 0 ? (
+        <EpisodePlayer
+          episodes={channelMatch.episodes}
+          title={channelMatch.seriesName}
+          channelName={channelMatch.channelName}
+        />
+      ) : (
+        <YoutubeSearchPlayer
+          query={`${m.name} sub indo`}
+          fallbackTitles={[m.name, m.original_name].filter(Boolean) as string[]}
+          label={`Tonton: ${m.name}`}
+        />
+      )}
+
+      {/* Seasons */}
+      {m.seasons && m.seasons.length > 0 && (
+        <section className="vx-section">
+          <div className="vx-section-head">
+            <div className="vx-section-title-group">
+              <div className="vx-section-eyebrow">Season</div>
+              <h2 className="vx-section-title">Daftar Musim</h2>
+            </div>
+          </div>
+          <div className="vx-row">
+            {m.seasons.filter((s) => s.season_number > 0 || s.episode_count > 0).map((s) => (
+              <div key={s.id} className="vx-poster">
+                <div className="vx-poster-thumb">
+                  <img src={tmdbImg(s.poster_path, "w342")} alt={s.name} loading="lazy" />
+                  <span className="vx-poster-badge">{s.episode_count} eps</span>
+                </div>
+                <div className="vx-poster-title">{s.name}</div>
+                <div className="vx-poster-sub">{s.air_date?.slice(0, 4)}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {cast.length > 0 && (
+        <section className="vx-section">
+          <div className="vx-section-head">
+            <div className="vx-section-title-group">
+              <div className="vx-section-eyebrow">Cast</div>
+              <h2 className="vx-section-title">Pemeran</h2>
+            </div>
+          </div>
+          <div className="vx-row">
+            {cast.slice(0, 16).map((c: any) => (
+              <div key={c.id} className="vx-poster" style={{ flex: "0 0 130px", width: 130 }}>
+                <div className="vx-poster-thumb" style={{ aspectRatio: "1" }}>
+                  <img src={tmdbImg(c.profile_path, "w185")} alt={c.name} loading="lazy" />
+                </div>
+                <div className="vx-poster-title" style={{ fontFamily: "var(--serif)" }}>{c.name}</div>
+                <div className="vx-poster-sub">{c.character}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {recs.length > 0 && (
+        <SectionRow eyebrow="Untuk Anda" title="Drama Mirip">
+          {recs.slice(0, 16).map((r) => (
+            <Poster key={r.id} href={`/drama/${r.id}`} title={r.name} poster={tmdbImg(r.poster_path, "w500")} score={r.vote_average} sub={r.first_air_date?.slice(0, 4)} />
+          ))}
+        </SectionRow>
+      )}
+
+      <div className="greek-divider"><span className="greek-laurel">✦</span></div>
+    </>
+  )
+}

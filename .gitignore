@@ -1,0 +1,47 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploaded files
+static/uploads/*
+!static/uploads/documents/.gitkeep
+!static/uploads/images/.gitkeep
+!static/uploads/videos/.gitkeep
+!static/uploads/apk/.gitkeep
+!static/uploads/others/.gitkeep
+
+# Temp files
+*.tmp
+*.temp
+temp_*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+
+# Local Netlify folder
+.netlify

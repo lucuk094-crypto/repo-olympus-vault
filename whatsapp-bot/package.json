@@ -1,0 +1,22 @@
+{
+  "name": "whatsapp-bot",
+  "version": "2.0.0",
+  "description": "WhatsApp Bot dengan fitur lengkap",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js"
+  },
+  "keywords": [
+    "whatsapp",
+    "bot"
+  ],
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "whatsapp-web.js": "1.34.7",
+    "qrcode-terminal": "0.12.0",
+    "axios": "1.6.0",
+    "canvas": "2.11.2"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "botName": "WhatsApp Bot",
+  "adminContact": "Hubungi admin",
+  "stickerName": "MyBot",
+  "stickerAuthor": "Bot",
+  "defaultReply": "Halo! Ketik !menu untuk bantuan.",
+  "autoReplies": {
+    "halo": "Halo juga!",
+    "hai": "Hai!",
+    "harga": "Hubungi admin"
+  }
+}

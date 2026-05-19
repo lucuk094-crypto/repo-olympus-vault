@@ -1,0 +1,99 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>Daftar - Olympus Vault</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="greek-border-top"></div>
+
+    <div class="hero">
+        <div class="card" style="max-width: 450px; width: 90%; margin: 0 auto;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🏛️</div>
+                <h1 class="greek-title" style="font-size: 2rem;">Daftar</h1>
+                <p style="color: var(--gold); font-style: italic;">Bergabung dengan Olympus</p>
+            </div>
+
+            {% if error %}
+            <div class="toast error" style="position: relative; margin-bottom: 1rem;">
+                <i class="fas fa-exclamation-circle"></i> {{ error }}
+            </div>
+            {% endif %}
+
+            <form action="/register" method="POST">
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: var(--gold);">
+                        <i class="fas fa-user"></i> Username
+                    </label>
+                    <input type="text" name="username" required minlength="4"
+                           style="width: 100%; padding: 12px; border-radius: 10px; border: 2px solid var(--gold-dark); background: var(--dark-light); color: var(--marble); font-size: 1rem;"
+                           placeholder="Minimal 4 karakter" autocomplete="username">
+                    <small style="color: var(--gold-dark); font-size: 0.85rem;">Minimal 4 karakter</small>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: var(--gold);">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input type="password" id="password" name="password" required minlength="8"
+                           style="width: 100%; padding: 12px; border-radius: 10px; border: 2px solid var(--gold-dark); background: var(--dark-light); color: var(--marble); font-size: 1rem;"
+                           placeholder="Minimal 8 karakter" autocomplete="new-password">
+                    <small style="color: var(--gold-dark); font-size: 0.85rem;">Minimal 8 karakter</small>
+                </div>
+
+                <div class="storage-bar" style="margin-bottom: 1.5rem;">
+                    <div class="storage-fill" id="strengthBar" style="width: 0%; background: var(--gold-dark);">
+                        <span id="strengthText" style="font-size: 0.85rem;">Kekuatan Password</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">
+                    <i class="fas fa-user-plus"></i> Daftar Sekarang
+                </button>
+            </form>
+
+            <div style="text-align: center; margin-top: 1.5rem;">
+                <p style="color: var(--marble);">
+                    Sudah punya akun?
+                    <a href="/login" style="color: var(--gold); text-decoration: none; font-weight: 600;">
+                        Masuk di sini
+                    </a>
+                </p>
+                <a href="/" style="color: var(--gold-dark); text-decoration: none; font-size: 0.9rem; margin-top: 1rem; display: inline-block;">
+                    <i class="fas fa-arrow-left"></i> Kembali ke Beranda
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="greek-border-bottom"></div>
+
+    <script>
+        document.getElementById('password').addEventListener('input', function(e) {
+            const password = e.target.value;
+            const strengthBar = document.getElementById('strengthBar');
+            const strengthText = document.getElementById('strengthText');
+
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (password.length >= 12) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+            const levels = ['Lemah', 'Lemah', 'Sedang', 'Kuat', 'Sangat Kuat', 'Maksimal'];
+            const colors = ['#8B4513', '#CD853F', '#DAA520', '#FFD700', '#FFA500', '#FF8C00'];
+
+            strengthBar.style.width = (strength * 20) + '%';
+            strengthBar.style.background = colors[strength] || '#8B4513';
+            strengthText.textContent = levels[strength] || 'Kekuatan Password';
+        });
+    </script>
+</body>
+</html>

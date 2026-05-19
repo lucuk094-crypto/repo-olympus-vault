@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MediaLink Downloader</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero" aria-labelledby="app-title">
+        <div class="hero-copy">
+          <p class="eyebrow">TikTok · YouTube · Facebook · X/Twitter</p>
+          <h1 id="app-title">MediaLink Downloader</h1>
+          <p class="subtext">
+            Tempel URL publik, pilih hasil yang tersedia, lalu unduh media yang
+            memang kamu miliki atau berizin untuk disimpan.
+          </p>
+        </div>
+      </section>
+
+      <section class="tool-panel" aria-label="Downloader">
+        <form id="downloadForm" class="url-form">
+          <label for="mediaUrl">URL media sosial</label>
+          <div class="input-row">
+            <input
+              id="mediaUrl"
+              name="mediaUrl"
+              type="url"
+              inputmode="url"
+              autocomplete="url"
+              value="https://vt.tiktok.com/ZS9KsYYFw/"
+              placeholder="https://vt.tiktok.com/ZS9KsYYFw/"
+              required
+            />
+            <button type="submit" id="analyzeButton">
+              <span class="button-icon" aria-hidden="true">↓</span>
+              Analisis
+            </button>
+          </div>
+          <p id="urlHint" class="hint" role="status">
+            Mendukung URL langsung gambar/video dan endpoint API untuk platform sosial.
+          </p>
+        </form>
+
+        <div class="platform-strip" aria-label="Platform yang didukung">
+          <span class="platform-pill" data-platform="tiktok">TikTok</span>
+          <span class="platform-pill" data-platform="youtube">YouTube</span>
+          <span class="platform-pill" data-platform="facebook">Facebook</span>
+          <span class="platform-pill" data-platform="twitter">X/Twitter</span>
+        </div>
+
+        <div class="settings-row">
+          <button type="button" id="settingsToggle" class="ghost-button">
+            Pengaturan API
+          </button>
+          <button type="button" id="clearHistory" class="ghost-button">
+            Bersihkan Riwayat
+          </button>
+        </div>
+
+        <div id="settingsPanel" class="settings-panel" hidden>
+          <label for="apiEndpoint">Endpoint serverless</label>
+          <div class="input-row compact">
+            <input id="apiEndpoint" type="text" value="http://localhost:3000/api/meta/download" />
+            <button type="button" id="saveEndpoint">Simpan</button>
+          </div>
+          <p class="hint">
+            Endpoint menerima query <code>?url=</code> dan mengembalikan JSON berisi daftar file.
+          </p>
+        </div>
+      </section>
+
+      <section id="statusPanel" class="status-panel" aria-live="polite" hidden>
+        <div class="loader" aria-hidden="true"></div>
+        <div>
+          <h2 id="statusTitle">Memproses URL</h2>
+          <p id="statusMessage">Menghubungi sumber media...</p>
+        </div>
+      </section>
+
+      <section id="resultPanel" class="result-panel" aria-label="Hasil download" hidden>
+        <div class="result-header">
+          <div>
+            <p id="resultPlatform" class="eyebrow">Media</p>
+            <h2 id="resultTitle">Hasil tersedia</h2>
+          </div>
+          <img id="resultThumb" alt="" hidden />
+        </div>
+        <div id="downloadList" class="download-list"></div>
+      </section>
+
+      <section class="history-section" aria-labelledby="historyTitle">
+        <div class="section-heading">
+          <h2 id="historyTitle">Riwayat</h2>
+          <span id="historyCount">0 item</span>
+        </div>
+        <div id="historyList" class="history-list"></div>
+      </section>
+    </main>
+
+    <template id="downloadItemTemplate">
+      <article class="download-item">
+        <div>
+          <h3></h3>
+          <p></p>
+        </div>
+        <a class="download-action" target="_blank" rel="noopener">Unduh</a>
+      </article>
+    </template>
+
+    <script src="script.js"></script>
+  </body>
+</html>

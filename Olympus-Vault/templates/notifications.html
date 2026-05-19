@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>Notifikasi - Olympus Vault</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="greek-border-top"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <i class="fas fa-landmark"></i> OLYMPUS VAULT
+        </div>
+        <div class="navbar-menu">
+            <a href="/dashboard" class="navbar-link"><i class="fas fa-home"></i> Beranda</a>
+            <a href="/gallery" class="navbar-link"><i class="fas fa-images"></i> Galeri</a>
+            <a href="/notifications" class="navbar-link"><i class="fas fa-bell"></i> Notifikasi</a>
+            <span class="navbar-link" style="color: var(--gold);">
+                <i class="fas fa-user"></i> {{ username }}
+            </span>
+            <a href="/logout" class="btn btn-secondary" style="padding: 8px 16px;">
+                <i class="fas fa-sign-out-alt"></i> Keluar
+            </a>
+        </div>
+    </nav>
+
+    <main style="padding: 100px 2rem 80px; max-width: 900px; margin: 0 auto;">
+        <div class="card" style="margin-bottom: 2rem;">
+            <h1 style="color: var(--gold); margin-bottom: 0.5rem;">
+                <i class="fas fa-bell"></i> Notifikasi
+            </h1>
+            <p style="color: var(--marble);">Semua aktivitas file Anda</p>
+        </div>
+
+        <!-- Notification List -->
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            {% for notif in notifications %}
+            <div class="card {% if notif.is_read == 0 %}slide-in{% endif %}"
+                 style="{% if notif.is_read == 0 %}border-left: 4px solid var(--gold);{% endif %} cursor: pointer;"
+                 onclick="markAsRead({{ notif.id }})">
+                <div style="display: flex; align-items: start; gap: 1rem;">
+                    <div style="font-size: 2rem;">
+                        {% if notif.type == 'upload' %}
+                        <i class="fas fa-cloud-upload-alt" style="color: var(--gold);"></i>
+                        {% elif notif.type == 'share' %}
+                        <i class="fas fa-share-alt" style="color: #667eea;"></i>
+                        {% elif notif.type == 'delete' %}
+                        <i class="fas fa-trash" style="color: #f44336;"></i>
+                        {% else %}
+                        <i class="fas fa-info-circle" style="color: var(--gold);"></i>
+                        {% endif %}
+                    </div>
+                    <div style="flex: 1;">
+                        <p style="color: var(--marble); margin-bottom: 0.5rem;">{{ notif.message }}</p>
+                        <small style="color: var(--gold-dark);">
+                            <i class="fas fa-clock"></i> {{ notif.created_at }}
+                        </small>
+                    </div>
+                    {% if notif.is_read == 0 %}
+                    <div style="width: 10px; height: 10px; background: var(--gold); border-radius: 50%;"></div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+
+            {% if notifications|length == 0 %}
+            <div class="card" style="text-align: center; padding: 3rem;">
+                <div style="font-size: 4rem; color: var(--gold-dark); margin-bottom: 1rem;">
+                    <i class="fas fa-bell-slash"></i>
+                </div>
+                <h3 style="color: var(--gold); margin-bottom: 0.5rem;">Belum Ada Notifikasi</h3>
+                <p style="color: var(--marble);">Notifikasi akan muncul saat ada aktivitas file</p>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <div class="greek-border-bottom"></div>
+
+    <script>
+        function markAsRead(notifId) {
+            fetch('/notifications/read/' + notifId, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    }
+                });
+        }
+    </script>
+</body>
+</html>

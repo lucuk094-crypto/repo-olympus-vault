@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>File Dibagikan - Olympus Vault</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="greek-border-top"></div>
+
+    <div class="hero">
+        <div class="card" style="max-width: 600px; width: 90%; margin: 0 auto;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🏛️</div>
+                <h1 class="greek-title" style="font-size: 2rem;">File Dibagikan</h1>
+                <p style="color: var(--gold); font-style: italic;">Olympus Vault</p>
+            </div>
+
+            <div class="card" style="background: var(--dark-light); margin-bottom: 2rem;">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                    <div style="font-size: 3rem; color: var(--gold);">
+                        {% if file.category == 'images' %}
+                        <i class="fas fa-image"></i>
+                        {% elif file.category == 'videos' %}
+                        <i class="fas fa-video"></i>
+                        {% elif file.category == 'documents' %}
+                        <i class="fas fa-file-alt"></i>
+                        {% elif file.category == 'apk' %}
+                        <i class="fab fa-android"></i>
+                        {% elif file.category == 'projects' %}
+                        <i class="fas fa-globe"></i>
+                        {% else %}
+                        <i class="fas fa-file"></i>
+                        {% endif %}
+                    </div>
+                    <div style="flex: 1;">
+                        <h3 style="color: var(--gold); margin-bottom: 0.5rem;">{{ file.original_name }}</h3>
+                        <p style="color: var(--marble); font-size: 0.9rem;">
+                            Dibagikan oleh: <strong>{{ file.username }}</strong>
+                        </p>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; padding-top: 1rem; border-top: 1px solid var(--gold-dark);">
+                    <span style="color: var(--gold-dark);">
+                        <i class="fas fa-hdd"></i> {{ (file.file_size / 1024 / 1024)|round(2) }} MB
+                    </span>
+                    <span style="color: var(--gold-dark);">
+                        <i class="fas fa-calendar"></i> {{ file.upload_date[:10] }}
+                    </span>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                {% if file.url_link %}
+                <a href="{{ file.url_link }}" target="_blank" class="btn btn-primary" style="flex: 1;">
+                    <i class="fas fa-external-link-alt"></i> Buka Link
+                </a>
+                {% else %}
+                <a href="/download/{{ file.id }}" class="btn btn-primary" style="flex: 1;">
+                    <i class="fas fa-download"></i> Download File
+                </a>
+                {% endif %}
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--gold-dark);">
+                <p style="color: var(--marble); margin-bottom: 1rem;">
+                    Ingin menyimpan file Anda sendiri dengan aman?
+                </p>
+                <a href="/" class="btn btn-secondary">
+                    <i class="fas fa-landmark"></i> Daftar Olympus Vault
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="greek-border-bottom"></div>
+</body>
+</html>

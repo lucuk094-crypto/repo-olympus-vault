@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>Masuk - Olympus Vault</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="greek-border-top"></div>
+
+    <div class="hero">
+        <div class="card" style="max-width: 450px; width: 90%; margin: 0 auto;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🏛️</div>
+                <h1 class="greek-title" style="font-size: 2rem;">Masuk</h1>
+                <p style="color: var(--gold); font-style: italic;">Pintu Gerbang Olympus</p>
+            </div>
+
+            {% if error %}
+            <div class="toast error" style="position: relative; margin-bottom: 1rem;">
+                <i class="fas fa-exclamation-circle"></i> {{ error }}
+            </div>
+            {% endif %}
+
+            {% if request.args.get('success') %}
+            <div class="toast success" style="position: relative; margin-bottom: 1rem;">
+                <i class="fas fa-check-circle"></i> Pendaftaran berhasil! Silakan masuk.
+            </div>
+            {% endif %}
+
+            <form action="/login" method="POST">
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: var(--gold);">
+                        <i class="fas fa-user"></i> Username
+                    </label>
+                    <input type="text" name="username" required
+                           style="width: 100%; padding: 12px; border-radius: 10px; border: 2px solid var(--gold-dark); background: var(--dark-light); color: var(--marble); font-size: 1rem;"
+                           placeholder="Masukkan username" autocomplete="username">
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: var(--gold);">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input type="password" name="password" required
+                           style="width: 100%; padding: 12px; border-radius: 10px; border: 2px solid var(--gold-dark); background: var(--dark-light); color: var(--marble); font-size: 1rem;"
+                           placeholder="Masukkan password" autocomplete="current-password">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">
+                    <i class="fas fa-sign-in-alt"></i> Masuk Sekarang
+                </button>
+            </form>
+
+            <div style="text-align: center; margin-top: 1.5rem;">
+                <p style="color: var(--marble);">
+                    Belum punya akun?
+                    <a href="/register" style="color: var(--gold); text-decoration: none; font-weight: 600;">
+                        Daftar di sini
+                    </a>
+                </p>
+                <a href="/" style="color: var(--gold-dark); text-decoration: none; font-size: 0.9rem; margin-top: 1rem; display: inline-block;">
+                    <i class="fas fa-arrow-left"></i> Kembali ke Beranda
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="greek-border-bottom"></div>
+</body>
+</html>
