@@ -232,23 +232,74 @@ function normalize(s: string): string {
     .trim()
 }
 
-// Find channel series matching given titles (english + romaji)
+// Find channel series matching given titles (english + romaji + original + character names)
 export async function findChannelSeries(titles: (string | null | undefined)[]): Promise<ChannelSeries | null> {
   const all = await getAllSeries()
   const queries = titles.filter(Boolean).map((t) => normalize(String(t)))
+
   for (const q of queries) {
     if (!q || q.length < 3) continue
+
     // exact match first
     let hit = all.find((s) => normalize(s.seriesName) === q)
     if (hit) return hit
-    // includes
+
+    // includes match
     hit = all.find((s) => {
       const n = normalize(s.seriesName)
       return n.includes(q) || q.includes(n)
     })
     if (hit) return hit
+
+    // fuzzy match with similarity score
+    let bestMatch: ChannelSeries | null = null
+    let bestScore = 0
+
+    for (const series of all) {
+      const n = normalize(series.seriesName)
+      const score = calculateSimilarity(q, n)
+      if (score > bestScore && score > 0.6) {
+        bestScore = score
+        bestMatch = series
+      }
+    }
+
+    if (bestMatch) return bestMatch
   }
+
   return null
+}
+
+// Calculate similarity score between two strings (Levenshtein distance)
+function calculateSimilarity(s1: string, s2: string): number {
+  const longer = s1.length > s2.length ? s1 : s2
+  const shorter = s1.length > s2.length ? s2 : s1
+
+  if (longer.length === 0) return 1.0
+
+  const editDistance = levenshteinDistance(longer, shorter)
+  return (longer.length - editDistance) / longer.length
+}
+
+function levenshteinDistance(s1: string, s2: string): number {
+  const costs: number[] = []
+  for (let i = 0; i <= s1.length; i++) {
+    let lastValue = i
+    for (let j = 0; j <= s2.length; j++) {
+      if (i === 0) {
+        costs[j] = j
+      } else if (j > 0) {
+        let newValue = costs[j - 1]
+        if (s1.charAt(i - 1) !== s2.charAt(j - 1)) {
+          newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1
+        }
+        costs[j - 1] = lastValue
+        lastValue = newValue
+      }
+    }
+    if (i > 0) costs[s2.length] = lastValue
+  }
+  return costs[s2.length]
 }
 
 export async function searchChannelSeries(query: string, limit = 20): Promise<ChannelSeries[]> {

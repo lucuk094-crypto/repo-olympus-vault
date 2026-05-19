@@ -12,7 +12,7 @@ export type ImgSize =
   | "w300" | "w1280"
 
 export const tmdbImg = (path: string | null | undefined, size: ImgSize = "w500"): string => {
-  if (!path) return "/placeholder.svg"
+  if (!path) return "https://via.placeholder.com/500x750/1a1a1a/gold?text=No+Image"
   return `${IMG}/${size}${path}`
 }
 

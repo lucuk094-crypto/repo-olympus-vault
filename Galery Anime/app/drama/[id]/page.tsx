@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import { Star } from "lucide-react"
 import { getTvDetail, pickTrailer, tmdbImg, type TmdbTv } from "@/lib/api/tmdb"
+import { getEnhancedTvData } from "@/lib/api/tmdb-tv-enhanced"
 import { findChannelSeries } from "@/lib/api/channels"
 import SectionRow from "@/components/section-row"
 import Poster from "@/components/poster"
@@ -9,6 +10,8 @@ import FavoriteButton from "@/components/favorite-button"
 import { TrailerButton } from "@/components/trailer-button"
 import EpisodePlayer from "@/components/episode-player"
 import YoutubeSearchPlayer from "@/components/youtube-search-player"
+import { VideoClipsPlayer } from "@/components/video-clips-player"
+import { PhotoGallery } from "@/components/photo-gallery"
 
 interface Props { params: Promise<{ id: string }> }
 
@@ -25,6 +28,9 @@ export default async function DramaDetail({ params }: Props) {
   const { id } = await params
   const m = await getTvDetail(id)
   if (!m) notFound()
+
+  // Fetch enhanced data (videos, images, reviews)
+  const enhanced = await getEnhancedTvData(id)
 
   const trailer = pickTrailer((m as any).videos?.results)
   const cast = (m as any).credits?.cast || []
@@ -115,6 +121,20 @@ export default async function DramaDetail({ params }: Props) {
           query={`${m.name} sub indo`}
           fallbackTitles={[m.name, m.original_name].filter(Boolean) as string[]}
           label={`Tonton: ${m.name}`}
+        />
+      )}
+
+      {/* Video Clips from TMDB */}
+      {enhanced?.videos && enhanced.videos.length > 0 && (
+        <VideoClipsPlayer videos={enhanced.videos} title={m.name} />
+      )}
+
+      {/* Photo Gallery */}
+      {enhanced?.images && (enhanced.images.backdrops.length > 0 || enhanced.images.posters.length > 0) && (
+        <PhotoGallery
+          backdrops={enhanced.images.backdrops}
+          posters={enhanced.images.posters}
+          title={m.name}
         />
       )}
 

@@ -1,4 +1,4 @@
-// Enhanced TMDB API with full IMDB-style data
+// Enhanced TMDB API for TV Shows with full IMDB-style data
 // Includes: videos (trailers, clips, teasers), images (backdrops, posters), reviews, keywords
 
 const READ_TOKEN = process.env.NEXT_PUBLIC_TMDB_READ_TOKEN || process.env.TMDB_READ_TOKEN ||
@@ -41,7 +41,7 @@ export interface TmdbReview {
   url: string
 }
 
-export interface EnhancedMovieData {
+export interface EnhancedTvData {
   videos: TmdbVideo[]
   images: {
     backdrops: TmdbImage[]
@@ -58,8 +58,8 @@ export interface EnhancedMovieData {
   }
 }
 
-// Fetch enhanced movie data (videos, images, reviews)
-export async function getEnhancedMovieData(movieId: string): Promise<EnhancedMovieData | null> {
+// Fetch enhanced TV data (videos, images, reviews)
+export async function getEnhancedTvData(tvId: string): Promise<EnhancedTvData | null> {
   try {
     const headers = {
       Authorization: `Bearer ${READ_TOKEN}`,
@@ -67,15 +67,15 @@ export async function getEnhancedMovieData(movieId: string): Promise<EnhancedMov
     }
 
     const [videosRes, imagesRes, reviewsRes, keywordsRes, externalRes] = await Promise.all([
-      fetch(`${BASE}/movie/${movieId}/videos?language=en-US`, { headers, next: { revalidate: 3600 } }),
-      fetch(`${BASE}/movie/${movieId}/images?include_image_language=en,null`, { headers, next: { revalidate: 3600 } }),
-      fetch(`${BASE}/movie/${movieId}/reviews?language=en-US&page=1`, { headers, next: { revalidate: 3600 } }),
-      fetch(`${BASE}/movie/${movieId}/keywords`, { headers, next: { revalidate: 3600 } }),
-      fetch(`${BASE}/movie/${movieId}/external_ids`, { headers, next: { revalidate: 3600 } }),
+      fetch(`${BASE}/tv/${tvId}/videos?language=en-US`, { headers, next: { revalidate: 3600 } }),
+      fetch(`${BASE}/tv/${tvId}/images?include_image_language=en,null`, { headers, next: { revalidate: 3600 } }),
+      fetch(`${BASE}/tv/${tvId}/reviews?language=en-US&page=1`, { headers, next: { revalidate: 3600 } }),
+      fetch(`${BASE}/tv/${tvId}/keywords`, { headers, next: { revalidate: 3600 } }),
+      fetch(`${BASE}/tv/${tvId}/external_ids`, { headers, next: { revalidate: 3600 } }),
     ])
 
     if (!videosRes.ok) {
-      console.error("TMDB videos fetch failed:", videosRes.status, await videosRes.text())
+      console.error("TMDB TV videos fetch failed:", videosRes.status, await videosRes.text())
       return null
     }
 
@@ -95,58 +95,13 @@ export async function getEnhancedMovieData(movieId: string): Promise<EnhancedMov
         logos: images.logos || [],
       },
       reviews: reviews.results || [],
-      keywords: keywords.keywords || [],
+      keywords: keywords.results || [],
       external_ids: external,
     }
   } catch (e) {
-    console.error("Enhanced movie data fetch failed:", e)
+    console.error("Enhanced TV data fetch failed:", e)
     return null
   }
-}
-
-// Group videos by type
-export function groupVideosByType(videos: TmdbVideo[]) {
-  const groups: Record<string, TmdbVideo[]> = {
-    Trailer: [],
-    Teaser: [],
-    Clip: [],
-    "Behind the Scenes": [],
-    Featurette: [],
-    Other: [],
-  }
-
-  for (const v of videos) {
-    if (v.site !== "YouTube") continue
-    const type = v.type || "Other"
-    if (groups[type]) {
-      groups[type].push(v)
-    } else {
-      groups.Other.push(v)
-    }
-  }
-
-  // Sort by official first, then by published date
-  for (const key in groups) {
-    groups[key].sort((a, b) => {
-      if (a.official !== b.official) return a.official ? -1 : 1
-      return new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
-    })
-  }
-
-  return groups
-}
-
-// Get best quality images
-export function getBestImages(images: TmdbImage[], limit = 20): TmdbImage[] {
-  return images
-    .sort((a, b) => {
-      // Sort by vote average, then vote count
-      if (b.vote_average !== a.vote_average) {
-        return b.vote_average - a.vote_average
-      }
-      return b.vote_count - a.vote_count
-    })
-    .slice(0, limit)
 }
 
 export function tmdbImageUrl(path: string | null, size: string = "original"): string {
