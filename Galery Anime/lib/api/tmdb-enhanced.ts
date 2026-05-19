@@ -1,7 +1,9 @@
 // Enhanced TMDB API with full IMDB-style data
 // Includes: videos (trailers, clips, teasers), images (backdrops, posters), reviews, keywords
 
-const TMDB_KEY = process.env.TMDB_API_KEY || "your_api_key_here"
+const READ_TOKEN = process.env.NEXT_PUBLIC_TMDB_READ_TOKEN || process.env.TMDB_READ_TOKEN ||
+  "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlYjc2YThhZTFjYzE3MTBiNjI5NzNjOGU0YWQ5MTU0NyIsIm5iZiI6MTc3OTA0MTI0Ni44MTEsInN1YiI6IjZhMGEwM2RlMDUzNzk4MWFmYTFlNzBhMCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.UdSVv7GE3Nle4Qc88D6UPa9wFlkCida-XMe3DDEpQMw"
+
 const BASE = "https://api.themoviedb.org/3"
 
 export interface TmdbVideo {
@@ -59,13 +61,23 @@ export interface EnhancedMovieData {
 // Fetch enhanced movie data (videos, images, reviews)
 export async function getEnhancedMovieData(movieId: string): Promise<EnhancedMovieData | null> {
   try {
+    const headers = {
+      Authorization: `Bearer ${READ_TOKEN}`,
+      "Content-Type": "application/json",
+    }
+
     const [videosRes, imagesRes, reviewsRes, keywordsRes, externalRes] = await Promise.all([
-      fetch(`${BASE}/movie/${movieId}/videos?api_key=${TMDB_KEY}&language=en-US`),
-      fetch(`${BASE}/movie/${movieId}/images?api_key=${TMDB_KEY}&include_image_language=en,null`),
-      fetch(`${BASE}/movie/${movieId}/reviews?api_key=${TMDB_KEY}&language=en-US&page=1`),
-      fetch(`${BASE}/movie/${movieId}/keywords?api_key=${TMDB_KEY}`),
-      fetch(`${BASE}/movie/${movieId}/external_ids?api_key=${TMDB_KEY}`),
+      fetch(`${BASE}/movie/${movieId}/videos?language=en-US`, { headers, next: { revalidate: 3600 } }),
+      fetch(`${BASE}/movie/${movieId}/images?include_image_language=en,null`, { headers, next: { revalidate: 3600 } }),
+      fetch(`${BASE}/movie/${movieId}/reviews?language=en-US&page=1`, { headers, next: { revalidate: 3600 } }),
+      fetch(`${BASE}/movie/${movieId}/keywords`, { headers, next: { revalidate: 3600 } }),
+      fetch(`${BASE}/movie/${movieId}/external_ids`, { headers, next: { revalidate: 3600 } }),
     ])
+
+    if (!videosRes.ok) {
+      console.error("TMDB videos fetch failed:", videosRes.status, await videosRes.text())
+      return null
+    }
 
     const [videos, images, reviews, keywords, external] = await Promise.all([
       videosRes.json(),
