@@ -124,14 +124,14 @@ export async function GET(request: Request) {
 
   // Channel configurations
   const channels = [
-    { id: 'UCApexAction1', name: 'Apex Action', genre: 'action', type: 'film' },
-    { id: 'UCJagoanDonghua', name: 'Jagoan Donghua', genre: 'action', type: 'anime' },
-    { id: 'UCHitFlix-RC', name: 'HitFlix', genre: 'action', type: 'film' },
-    { id: 'UCMovieSphereHorror-SciFi', name: 'MovieSphere Horror', genre: 'horror', type: 'film' },
-    { id: 'UCAmazingAnimeMan', name: 'Amazing Anime Man', genre: 'action', type: 'anime' },
-    { id: 'UCSuperheroFXLGames', name: 'Superhero FXL', genre: 'action', type: 'film' },
-    { id: 'UChotanime-ri9zc', name: 'Hot Anime', genre: 'action', type: 'anime' },
-    { id: 'UCFILVOXFOX', name: 'FILVOX FOX', genre: 'action', type: 'film' }
+    { id: 'UCApexAction1', name: 'Apex Action', genre: 'action', type: 'film', minDuration: 3600 },
+    { id: 'UCJagoanDonghua', name: 'Jagoan Donghua', genre: 'action', type: 'anime', minDuration: 1200 },
+    { id: 'UCHitFlix-RC', name: 'HitFlix', genre: 'action', type: 'film', minDuration: 3600 },
+    { id: 'UCMovieSphereHorror-SciFi', name: 'MovieSphere Horror', genre: 'horror', type: 'film', minDuration: 3600 },
+    { id: 'UCAmazingAnimeMan', name: 'Amazing Anime Man', genre: 'action', type: 'anime', minDuration: 1200 },
+    { id: 'UCSuperheroFXLGames', name: 'Superhero FXL', genre: 'action', type: 'film', minDuration: 3600 },
+    { id: 'UChotanime-ri9zc', name: 'Hot Anime', genre: 'action', type: 'anime', minDuration: 1200 },
+    { id: 'UCFILVOXFOX', name: 'FILVOX FOX', genre: 'action', type: 'film', minDuration: 3600 }
   ]
 
   try {
@@ -146,11 +146,11 @@ export async function GET(request: Request) {
       const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channel.id}`
       const videos = await parseRSSFeed(rssUrl)
 
-      // Filter for full-length videos (>20 minutes)
+      // Filter for full-length videos based on channel type
       const fullLengthVideos = []
       for (const video of videos.slice(0, 15)) { // Check latest 15 videos
         const duration = await getVideoDuration(video.videoId)
-        if (duration >= 1200) { // 20 minutes minimum
+        if (duration >= channel.minDuration) { // Use channel-specific minimum duration
           fullLengthVideos.push({
             ...video,
             duration,

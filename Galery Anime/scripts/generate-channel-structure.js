@@ -15,7 +15,8 @@ const CHANNELS = [
     name: 'Apex Action',
     genre: 'action',
     type: 'film',
-    description: 'Full-length action movies'
+    description: 'Full-length action movies',
+    minDuration: 3600 // 1 hour minimum for full movies
   },
   {
     channelId: 'UC_JagoanDonghua',
@@ -23,7 +24,8 @@ const CHANNELS = [
     name: 'Jagoan Donghua',
     genre: 'action',
     type: 'anime',
-    description: 'Chinese animation series'
+    description: 'Chinese animation series',
+    minDuration: 1200 // 20 minutes for anime episodes
   },
   {
     channelId: 'UC_HitFlix',
@@ -31,7 +33,8 @@ const CHANNELS = [
     name: 'HitFlix',
     genre: 'action',
     type: 'film',
-    description: 'Action and thriller movies'
+    description: 'Action and thriller movies',
+    minDuration: 3600 // 1 hour minimum for full movies
   },
   {
     channelId: 'UC_MovieSphere',
@@ -39,7 +42,8 @@ const CHANNELS = [
     name: 'MovieSphere Horror & SciFi',
     genre: 'horror',
     type: 'film',
-    description: 'Horror and sci-fi movies'
+    description: 'Horror and sci-fi movies',
+    minDuration: 3600 // 1 hour minimum for full movies
   },
   {
     channelId: 'UC_AmazingAnime',
@@ -47,7 +51,8 @@ const CHANNELS = [
     name: 'Amazing Anime Man',
     genre: 'action',
     type: 'anime',
-    description: 'Anime series and movies'
+    description: 'Anime series and movies',
+    minDuration: 1200 // 20 minutes for anime episodes
   },
   {
     channelId: 'UC_SuperheroFXL',
@@ -55,7 +60,8 @@ const CHANNELS = [
     name: 'Superhero FXL Games',
     genre: 'action',
     type: 'film',
-    description: 'Superhero action movies'
+    description: 'Superhero action movies',
+    minDuration: 3600 // 1 hour minimum for full movies
   },
   {
     channelId: 'UC_HotAnime',
@@ -63,7 +69,8 @@ const CHANNELS = [
     name: 'Hot Anime',
     genre: 'action',
     type: 'anime',
-    description: 'Popular anime series'
+    description: 'Popular anime series',
+    minDuration: 1200 // 20 minutes for anime episodes
   },
   {
     channelId: 'UC_FILVOXFOX',
@@ -71,7 +78,8 @@ const CHANNELS = [
     name: 'FILVOX FOX',
     genre: 'action',
     type: 'film',
-    description: 'Action movies collection'
+    description: 'Action movies collection',
+    minDuration: 3600 // 1 hour minimum for full movies
   }
 ]
 
