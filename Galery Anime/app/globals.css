@@ -590,37 +590,29 @@ body::before {
   height: var(--bottomnav-h);
   border-radius: 24px;
   padding: 0 4px;
-  background:
-    linear-gradient(135deg,
-      rgba(245, 241, 232, 0.06) 0%,
-      rgba(245, 241, 232, 0.03) 50%,
-      rgba(245, 241, 232, 0.08) 100%),
-    rgba(10, 14, 26, 0.55);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(245, 241, 232, 0.14);
+  background: rgba(10, 14, 26, 0.95);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1.5px solid rgba(212, 175, 55, 0.25);
   box-shadow:
-    0 -2px 0 rgba(245, 241, 232, 0.06) inset,
-    0 1px 0 rgba(245, 241, 232, 0.18) inset,
-    0 8px 32px rgba(0, 0, 0, 0.45),
-    0 0 0 1px rgba(212, 175, 55, 0.08),
-    0 0 24px rgba(212, 175, 55, 0.06);
+    0 -2px 0 rgba(212, 175, 55, 0.1) inset,
+    0 1px 0 rgba(245, 241, 232, 0.15) inset,
+    0 12px 40px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(212, 175, 55, 0.15),
+    0 0 32px rgba(212, 175, 55, 0.12);
   overflow: hidden;
 }
 
 html.light .vx-bottomnav {
-  background:
-    linear-gradient(135deg,
-      rgba(255, 255, 255, 0.65) 0%,
-      rgba(255, 255, 255, 0.45) 50%,
-      rgba(255, 255, 255, 0.7) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1.5px solid rgba(212, 175, 55, 0.3);
   box-shadow:
-    0 -2px 0 rgba(255, 255, 255, 0.65) inset,
-    0 1px 0 rgba(255, 255, 255, 0.85) inset,
-    0 12px 36px rgba(26, 20, 16, 0.18),
-    0 0 0 1px rgba(212, 175, 55, 0.16),
-    0 0 28px rgba(212, 175, 55, 0.12);
+    0 -2px 0 rgba(212, 175, 55, 0.08) inset,
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 12px 40px rgba(0, 0, 0, 0.15),
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(212, 175, 55, 0.2),
+    0 0 32px rgba(212, 175, 55, 0.15);
 }
 
 /* Light reflection sweep — animated highlight on top edge */
@@ -681,10 +673,10 @@ html.light .vx-bottomnav {
   border: 0;
   color: var(--text-3);
   font: inherit;
-  font-size: 0.62rem;
+  font-size: 0.65rem;
   font-weight: 600;
   cursor: pointer;
-  transition: color 0.25s ease;
+  transition: all 0.25s ease;
   font-family: var(--serif);
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -693,54 +685,60 @@ html.light .vx-bottomnav {
 }
 
 .vx-bottomnav-item svg {
-  width: 22px;
-  height: 22px;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  width: 24px;
+  height: 24px;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  stroke-width: 2;
 }
 
-.vx-bottomnav-item:hover { color: var(--text-2); }
-.vx-bottomnav-item:hover svg { transform: translateY(-1px); }
+.vx-bottomnav-item:hover {
+  color: var(--text-2);
+}
+.vx-bottomnav-item:hover svg {
+  transform: translateY(-2px) scale(1.05);
+}
 
 .vx-bottomnav-item.active {
   color: var(--gold);
 }
 .vx-bottomnav-item.active svg {
-  transform: translateY(-2px);
-  filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.6));
+  transform: translateY(-2px) scale(1.1);
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.7));
+  stroke-width: 2.5;
 }
 
-/* Glow pill behind active item */
+/* Solid background pill behind active item */
 .vx-bottomnav-item.active::before {
   content: "";
   position: absolute;
   inset: 6px 8px;
-  background:
-    radial-gradient(ellipse at center,
-      rgba(212, 175, 55, 0.22) 0%,
-      rgba(212, 175, 55, 0.08) 50%,
-      transparent 75%);
+  background: rgba(212, 175, 55, 0.15);
   border-radius: 14px;
   z-index: -1;
   animation: vx-glow-pulse 2.5s ease-in-out infinite;
 }
 
+html.light .vx-bottomnav-item.active::before {
+  background: rgba(212, 175, 55, 0.2);
+}
+
 @keyframes vx-glow-pulse {
-  0%, 100% { opacity: 0.7; transform: scale(0.95); }
+  0%, 100% { opacity: 0.8; transform: scale(0.96); }
   50%      { opacity: 1; transform: scale(1.02); }
 }
 
-/* Indicator dot above active item (Donghive style) */
+/* Top indicator line for active item */
 .vx-bottomnav-item.active::after {
   content: "";
   position: absolute;
-  top: -1px;
+  top: 8px;
   left: 50%;
   transform: translateX(-50%);
-  width: 16px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  border-radius: 1px;
-  box-shadow: 0 0 8px var(--gold);
+  width: 20px;
+  height: 3px;
+  background: var(--gold);
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
 }
 
 /* ============================================
