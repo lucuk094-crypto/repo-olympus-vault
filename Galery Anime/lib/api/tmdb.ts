@@ -274,6 +274,36 @@ export async function discoverMovieByLang(opts: { language?: string; page?: numb
   return (await r.json()) as { results: TmdbMovie[]; total_pages: number }
 }
 
+export async function discoverMovies(opts: { genre?: number; page?: number } = {}) {
+  const params = new URLSearchParams({
+    language: "id-ID",
+    page: String(opts.page || 1),
+    sort_by: "popularity.desc",
+    ...(opts.genre && { with_genres: String(opts.genre) }),
+  })
+  const r = await fetch(`${BASE}/discover/movie?${params}`, {
+    headers: { Authorization: `Bearer ${READ_TOKEN}` },
+    next: { revalidate: 3600 },
+  })
+  if (!r.ok) return null
+  return (await r.json()) as { results: TmdbMovie[]; total_pages: number }
+}
+
+export async function discoverTv(opts: { genre?: number; page?: number } = {}) {
+  const params = new URLSearchParams({
+    language: "id-ID",
+    page: String(opts.page || 1),
+    sort_by: "popularity.desc",
+    ...(opts.genre && { with_genres: String(opts.genre) }),
+  })
+  const r = await fetch(`${BASE}/discover/tv?${params}`, {
+    headers: { Authorization: `Bearer ${READ_TOKEN}` },
+    next: { revalidate: 3600 },
+  })
+  if (!r.ok) return null
+  return (await r.json()) as { results: TmdbTv[]; total_pages: number }
+}
+
 // === Multi search (movies + tv + people) ===
 export async function searchMulti(query: string, page = 1) {
   const r = await fetch(`${BASE}/search/multi?language=id-ID&query=${encodeURIComponent(query)}&page=${page}`, {
