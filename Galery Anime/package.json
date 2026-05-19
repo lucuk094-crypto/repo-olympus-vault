@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "scrape": "node scripts/fetch-channels.js",
+    "auto-update": "node scripts/auto-update.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

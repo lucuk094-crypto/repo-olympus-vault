@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import { Star, ExternalLink } from "lucide-react"
 import { getMovieDetail, pickTrailer, tmdbImg, type TmdbMovie } from "@/lib/api/tmdb"
+import { getEnhancedMovieData } from "@/lib/api/tmdb-enhanced"
 import { findChannelSeries } from "@/lib/api/channels"
 import SectionRow from "@/components/section-row"
 import Poster from "@/components/poster"
@@ -9,6 +10,8 @@ import FavoriteButton from "@/components/favorite-button"
 import { TrailerButton } from "@/components/trailer-button"
 import EpisodePlayer from "@/components/episode-player"
 import YoutubeSearchPlayer from "@/components/youtube-search-player"
+import { VideoClipsPlayer } from "@/components/video-clips-player"
+import { PhotoGallery } from "@/components/photo-gallery"
 
 interface Props { params: Promise<{ id: string }> }
 
@@ -25,6 +28,9 @@ export default async function FilmDetail({ params }: Props) {
   const { id } = await params
   const m = await getMovieDetail(id)
   if (!m) notFound()
+
+  // Fetch enhanced data (videos, images, reviews)
+  const enhanced = await getEnhancedMovieData(id)
 
   const trailer = pickTrailer((m as any).videos?.results)
   const cast = (m as any).credits?.cast || []
@@ -122,6 +128,20 @@ export default async function FilmDetail({ params }: Props) {
           query={`${m.title} ${m.release_date?.slice(0, 4) || ""} trailer`}
           fallbackTitles={[m.title, m.original_title].filter(Boolean) as string[]}
           label={`Trailer & Klip: ${m.title}`}
+        />
+      )}
+
+      {/* Video Clips from TMDB */}
+      {enhanced?.videos && enhanced.videos.length > 0 && (
+        <VideoClipsPlayer videos={enhanced.videos} title={m.title} />
+      )}
+
+      {/* Photo Gallery */}
+      {enhanced?.images && (enhanced.images.backdrops.length > 0 || enhanced.images.posters.length > 0) && (
+        <PhotoGallery
+          backdrops={enhanced.images.backdrops}
+          posters={enhanced.images.posters}
+          title={m.title}
         />
       )}
 
